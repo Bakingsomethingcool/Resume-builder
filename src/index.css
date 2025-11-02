@@ -229,25 +229,24 @@
 }
 
 @media print {
-  /* Isolate printing to only the preview */
-  body * {
-    visibility: hidden !important;
-  }
-  .preview-wrapper,
-  .preview-wrapper * {
-    visibility: visible !important;
-  }
-  .preview-wrapper {
-    position: fixed !important;
-    left: 0;
-    top: 0;
-    width: auto !important;
-    height: auto !important;
-    transform: none !important; /* prevent zoom scaling in print */
-    background: white !important;
+  /* Hide app chrome; keep only the preview area */
+  .h-full > .border-b,
+  .h-full > .flex-1 > .flex-\[1\.15\],
+  .h-full > .flex-1 > aside,
+  header,
+  nav,
+  footer,
+  button,
+  [role="button"] {
+    display: none !important;
   }
 
-  /* Only print the first A4 page */
+  /* Reset the zoom wrapper transform so print isn't scaled */
+  .mx-auto {
+    transform: none !important;
+  }
+
+  /* Only print the first resume page */
   .preview-wrapper .page:not(:first-child) {
     display: none !important;
   }
@@ -265,5 +264,6 @@
     box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
+    page-break-after: auto !important;
   }
 }
