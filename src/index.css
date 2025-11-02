@@ -260,11 +260,65 @@
     width: 210mm !important;
     height: 297mm !important;
     margin: 0 !important;
-    padding: 2.5rem !important;
+    padding: 0 !important;
     box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
     page-break-after: auto !important;
     overflow: hidden !important;
+  }
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Ensure only the preview area contributes to print layout with no spacing */
+  .h-full > .flex-1,
+  .h-full > .flex-1 > .flex-\[1\],
+  #resume-preview {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Reset any zoom/scale and spacing on the preview wrapper */
+  .preview-wrapper {
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    background: #ffffff !important;
+  }
+
+  /* Force exact page box with zero padding and no shadows */
+  .preview-wrapper .page {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: hidden !important;
+  }
+
+  /* Avoid any accidental spacing on the content root */
+  #resume-preview > .page:first-child {
+    margin: 0 !important;
+  }
+
+  /* Preserve colors and avoid washed out print */
+  .preview-wrapper * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
