@@ -210,6 +210,25 @@ export function PreviewPanel({
   return (
     <div className={`preview-wrapper ${className}`}>
       <style>{finalCss}</style>
+      {/* Force resume preview to stay light in dark mode */}
+      <style>{`
+        .dark #resume-preview,
+        .dark #resume-preview .page {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+        }
+        .dark #resume-preview * {
+          background-color: transparent !important;
+          color: inherit !important;
+        }
+        .dark #resume-preview h2 {
+          color: var(--theme-color) !important;
+          border-bottom-color: var(--theme-color) !important;
+        }
+        .dark #resume-preview hr {
+          border-top-color: #ddd !important;
+        }
+      `}</style>
       {/* Ensure all CSS rules targeting #resume-preview apply to all pages */}
       <div ref={containerRef} id="resume-preview" />
     </div>
