@@ -1,12 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Rocket } from "lucide-react";
+import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Rocket, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 
 export default function Landing() {
   const { isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Add theme state + initializer
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const enableDark = stored ? stored === "dark" : prefersDark;
+    document.documentElement.classList.toggle("dark", enableDark);
+    setIsDark(enableDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light");
+    } catch {}
+  };
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -44,15 +67,31 @@ export default function Landing() {
               <Sparkles className="h-3 w-3" /> New
             </span>
           </div>
-          <Button variant="ghost" onClick={handleGetStarted} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : isAuthenticated ? (
-              "Dashboard"
-            ) : (
-              "Sign In"
-            )}
-          </Button>
+          {/* Right actions: Dark mode toggle + Auth button */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              className="h-9 w-9"
+            >
+              {isDark ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+            <Button variant="ghost" onClick={handleGetStarted} disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isAuthenticated ? (
+                "Dashboard"
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 
