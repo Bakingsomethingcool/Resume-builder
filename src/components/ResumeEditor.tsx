@@ -69,7 +69,7 @@ const getPreviewHtml = () => {
           <meta charset="utf-8" />
           <style>
             /* Base and theme */
-            html, body { margin: 0; padding: 0; height: auto; overflow: visible; }
+            html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
             body { background: #f3f4f6; }
             :root { --theme-color: ${themeColor}; --page-width: ${size.width}px; --page-height: ${size.height}px; --page-gap: 16px; --page-padding: 40px; }
 
@@ -477,7 +477,7 @@ const getPreviewHtml = () => {
                 style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
               >
                 <div
-                  className="bg-white shadow-sm rounded-xl border"
+                  className="bg-white shadow-sm rounded-xl border overflow-hidden"
                   style={{
                     width: `${size.width}px`,
                     height: `${contentHeight}px`,
@@ -489,6 +489,8 @@ const getPreviewHtml = () => {
                     ref={previewRef}
                     title="Resume Preview"
                     className="w-full h-full border-0 rounded-xl"
+                    scrolling="no"
+                    style={{ overflow: "hidden" }}
                   />
                 </div>
               </div>
@@ -621,7 +623,7 @@ const getPreviewHtml = () => {
                   style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
                 >
                   <div
-                    className="bg-white shadow-sm rounded-xl border"
+                    className="bg-white shadow-sm rounded-xl border overflow-hidden"
                     style={{
                       width: `${size.width}px`,
                       height: `${contentHeight}px`,
@@ -633,6 +635,8 @@ const getPreviewHtml = () => {
                       ref={previewRef}
                       title="Resume Preview Fullscreen"
                       className="w-full h-full border-0 rounded-xl"
+                      scrolling="no"
+                      style={{ overflow: "hidden" }}
                     />
                   </div>
                 </div>
