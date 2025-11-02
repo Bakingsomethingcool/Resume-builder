@@ -49,18 +49,16 @@ const isDark =
       <!DOCTYPE html>
       <html>
         <head>
+          <meta charset="utf-8" />
+          <style>html,body{margin:0;padding:0;}</style>
           <style>${css}</style>
         </head>
         <body>${html}</body>
       </html>
     `;
     const iframe = previewRef.current;
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(fullHtml);
-      doc.close();
-    }
+    // Use srcdoc to reliably inject HTML + CSS so styles always apply
+    iframe.srcdoc = fullHtml;
   };
 
   const handleSave = async () => {
@@ -181,13 +179,13 @@ const isDark =
       {/* Editor and Preview */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
         {/* Editor */}
-        <div className="border-r flex flex-col min-h-0 overflow-auto">
+        <div className="border-r flex flex-col min-h-0 overflow-hidden">
           <Tabs defaultValue="markdown" className="flex-1 flex flex-col min-h-0">
             <TabsList className="sticky top-0 z-10 bg-background w-full justify-start rounded-none border-b">
               <TabsTrigger value="markdown">Markdown</TabsTrigger>
               <TabsTrigger value="css">CSS</TabsTrigger>
             </TabsList>
-            <TabsContent value="markdown" className="m-0 p-4">
+            <TabsContent value="markdown" className="m-0 p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Edit your resume content
               </Label>
@@ -196,9 +194,10 @@ const isDark =
                 extensions={[markdownLang()]}
                 theme={isDark ? oneDark : undefined}
                 onChange={(value: string) => setMarkdown(value)}
+                height="100%"
               />
             </TabsContent>
-            <TabsContent value="css" className="m-0 p-4">
+            <TabsContent value="css" className="m-0 p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Customize styling
               </Label>
@@ -207,6 +206,7 @@ const isDark =
                 extensions={[cssLang()]}
                 theme={isDark ? oneDark : undefined}
                 onChange={(value: string) => setCss(value)}
+                height="100%"
               />
             </TabsContent>
           </Tabs>
