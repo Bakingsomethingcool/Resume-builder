@@ -270,9 +270,30 @@ const isDark =
             const scaledHeight = size.height * zoom;
             return (
               <div
-                className="mx-auto"
+                className="mx-auto relative"
                 style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
               >
+                {/* Floating preview controls: zoom out, zoom in, fullscreen, download */}
+                <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                  <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={handleZoomIn} aria-label="Zoom in">
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsFullscreen(true)}
+                    aria-label="Enter fullscreen"
+                  >
+                    <Maximize className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={exportToPDF} aria-label="Export PDF">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+
                 <div
                   className="bg-white shadow-sm rounded-xl border"
                   style={{
