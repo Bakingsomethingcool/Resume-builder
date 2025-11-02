@@ -32,58 +32,53 @@ export const templates: Template[] = [
 
 ## Skills
 JavaScript, TypeScript, React, Node.js, Python, SQL`,
-    css: `body {
+    css: `#resume-preview {
   font-family: 'Inter', -apple-system, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 48px 32px;
-  line-height: 1.6;
   color: #1a1a1a;
+  line-height: 1.6;
 }
-
-h1 {
+#resume-preview h1 {
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 8px 0;
   color: #000;
 }
-
-h2 {
+#resume-preview h2 {
   font-size: 18px;
   font-weight: 600;
-  margin: 32px 0 16px 0;
+  margin: 24px 0 10px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2px solid var(--theme-color);
   color: #000;
 }
-
-h3 {
+#resume-preview h3 {
   font-size: 16px;
   font-weight: 600;
-  margin: 16px 0 4px 0;
+  margin: 12px 0 4px 0;
   color: #1a1a1a;
 }
-
-p {
-  margin: 4px 0;
+#resume-preview p {
+  margin: 6px 0;
   font-size: 14px;
   color: #525252;
 }
-
-strong {
-  font-weight: 500;
+#resume-preview strong {
+  font-weight: 600;
   color: #1a1a1a;
 }
-
-ul {
+#resume-preview ul {
   margin: 8px 0;
   padding-left: 20px;
 }
-
-li {
+#resume-preview li {
   margin: 4px 0;
   font-size: 14px;
   color: #525252;
+}
+#resume-preview hr {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 16px 0;
 }`,
   },
   {
@@ -121,57 +116,50 @@ State University | 2013
 ## Certifications
 - PMP Certified
 - Scrum Master Certified`,
-    css: `body {
+    css: `#resume-preview {
   font-family: 'Inter', sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 32px;
-  line-height: 1.7;
   color: #262626;
+  line-height: 1.7;
 }
-
-h1 {
+#resume-preview h1 {
   font-size: 28px;
   font-weight: 700;
   margin: 0 0 12px 0;
   letter-spacing: -0.5px;
   color: #000;
 }
-
-h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 32px 0 12px 0;
+#resume-preview h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 28px 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #000;
+  border-bottom: 2px solid var(--theme-color);
+  padding-bottom: 6px;
 }
-
-h3 {
+#resume-preview h3 {
   font-size: 15px;
   font-weight: 600;
-  margin: 16px 0 2px 0;
+  margin: 12px 0 2px 0;
   color: #1a1a1a;
 }
-
-p, li {
+#resume-preview p,
+#resume-preview li {
   font-size: 14px;
   color: #525252;
   margin: 6px 0;
 }
-
-em {
+#resume-preview em {
   font-style: italic;
   color: #737373;
   font-size: 13px;
 }
-
-ul {
-  margin: 8px 0 16px 0;
+#resume-preview ul {
+  margin: 8px 0 12px 0;
   padding-left: 20px;
 }
-
-strong {
+#resume-preview strong {
   font-weight: 600;
   color: #1a1a1a;
 }`,
@@ -210,49 +198,42 @@ Created user interfaces and conducted user research for mobile applications.
 Design: Figma, Sketch, Adobe Creative Suite
 Prototyping: Framer, Principle
 Research: User interviews, A/B testing`,
-    css: `body {
+    css: `#resume-preview {
   font-family: 'Inter', sans-serif;
-  max-width: 750px;
-  margin: 0 auto;
-  padding: 56px 40px;
-  line-height: 1.65;
   color: #171717;
+  line-height: 1.65;
 }
-
-h1 {
+#resume-preview h1 {
   font-size: 36px;
   font-weight: 700;
   margin: 0 0 4px 0;
   color: #000;
 }
-
-h2 {
+#resume-preview h2 {
   font-size: 14px;
   font-weight: 600;
-  margin: 40px 0 16px 0;
+  margin: 32px 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #000;
+  border-bottom: 2px solid var(--theme-color);
+  padding-bottom: 6px;
 }
-
-p {
+#resume-preview p {
   margin: 8px 0;
   font-size: 14px;
   color: #404040;
 }
-
-strong {
+#resume-preview strong {
   font-weight: 600;
   color: #000;
 }
-
-hr {
+#resume-preview hr {
   border: none;
   border-top: 1px solid #e5e5e5;
-  margin: 24px 0;
+  margin: 20px 0;
 }
-
-em {
+#resume-preview em {
   font-style: normal;
   color: #737373;
   font-size: 13px;
