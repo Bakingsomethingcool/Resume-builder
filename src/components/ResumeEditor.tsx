@@ -7,7 +7,7 @@ import { markdown as markdownLang } from "@codemirror/lang-markdown";
 import { css as cssLang } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { markdownToHtml } from "@/lib/markdown-to-html";
-import { Download, FileDown, FileUp, Save } from "lucide-react";
+import { Download, FileDown, FileUp, Save, ZoomIn, ZoomOut, Maximize, Minimize } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
@@ -43,6 +43,8 @@ export function ResumeEditor({
   const previewRef = useRef<HTMLIFrameElement>(null);
   const [paperSize, setPaperSize] = useState<"A4" | "Letter">("A4");
   const [themeColor, setThemeColor] = useState("#377BB5");
+  const [zoom, setZoom] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const PAPER_SIZES = {
     A4: { width: 794, height: 1123 },
     Letter: { width: 816, height: 1056 },
@@ -144,6 +146,12 @@ const isDark =
     input.click();
   };
 
+  // Helpers for zoom controls
+  const clamp = (v: number, min = 0.5, max = 2) => Math.min(max, Math.max(min, v));
+  const handleZoomIn = () => setZoom((z) => clamp(Number((z + 0.1).toFixed(2))));
+  const handleZoomOut = () => setZoom((z) => clamp(Number((z - 0.1).toFixed(2))));
+  const handleZoomReset = () => setZoom(1);
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -225,19 +233,33 @@ const isDark =
 
         {/* Preview */}
         <div className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
-          <div
-            className="bg-white shadow-sm mx-auto rounded-xl border"
-            style={{
-              width: `${PAPER_SIZES[paperSize].width}px`,
-            }}
-          >
-            <iframe
-              ref={previewRef}
-              title="Resume Preview"
-              className="w-full border-0 rounded-xl"
-              style={{ height: `${PAPER_SIZES[paperSize].height}px` }}
-            />
-          </div>
+          {(() => {
+            const size = PAPER_SIZES[paperSize];
+            const scaledWidth = size.width * zoom;
+            const scaledHeight = size.height * zoom;
+            return (
+              <div
+                className="mx-auto"
+                style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
+              >
+                <div
+                  className="bg-white shadow-sm rounded-xl border"
+                  style={{
+                    width: `${size.width}px`,
+                    height: `${size.height}px`,
+                    transform: `scale(${zoom})`,
+                    transformOrigin: "top left",
+                  }}
+                >
+                  <iframe
+                    ref={previewRef}
+                    title="Resume Preview"
+                    className="w-full h-full border-0 rounded-xl"
+                  />
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Right Actions Sidebar */}
@@ -269,6 +291,31 @@ const isDark =
           </div>
 
           <Separator />
+
+          {/* Preview Controls */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Preview</h3>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleZoomReset} className="px-3">
+                {(zoom * 100).toFixed(0)}%
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleZoomIn} aria-label="Zoom in">
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="ml-auto"
+                onClick={() => setIsFullscreen(true)}
+                aria-label="Enter fullscreen"
+              >
+                <Maximize className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
 
           <div>
             <h3 className="text-sm font-semibold mb-2">Paper Size</h3>
@@ -305,6 +352,61 @@ const isDark =
           </div>
         </aside>
       </div>
+
+      {/* Fullscreen Overlay */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm">
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleZoomReset} className="px-3">
+              {(zoom * 100).toFixed(0)}%
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleZoomIn} aria-label="Zoom in">
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="default"
+              size="icon"
+              onClick={() => setIsFullscreen(false)}
+              aria-label="Exit fullscreen"
+            >
+              <Minimize className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="w-full h-full overflow-auto p-6">
+            {(() => {
+              const size = PAPER_SIZES[paperSize];
+              const scaledWidth = size.width * zoom;
+              const scaledHeight = size.height * zoom;
+              return (
+                <div
+                  className="mx-auto"
+                  style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
+                >
+                  <div
+                    className="bg-white shadow-sm rounded-xl border"
+                    style={{
+                      width: `${size.width}px`,
+                      height: `${size.height}px`,
+                      transform: `scale(${zoom})`,
+                      transformOrigin: "top left",
+                    }}
+                  >
+                    <iframe
+                      ref={previewRef}
+                      title="Resume Preview Fullscreen"
+                      className="w-full h-full border-0 rounded-xl"
+                    />
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
