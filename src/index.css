@@ -131,4 +131,33 @@
     margin: 0;
     padding: 0;
   }
+  
+  /* Hide everything except the preview */
+  body > *:not(#root) {
+    display: none !important;
+  }
+  
+  #root > *:not(.preview-wrapper) {
+    display: none !important;
+  }
+  
+  /* Show only the preview wrapper */
+  .preview-wrapper {
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Ensure pages print correctly */
+  .page {
+    page-break-after: always;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .page:last-child {
+    page-break-after: auto;
+  }
 }
