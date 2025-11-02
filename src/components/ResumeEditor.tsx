@@ -7,7 +7,7 @@ import { markdown as markdownLang } from "@codemirror/lang-markdown";
 import { css as cssLang } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { Download, FileDown, FileUp, Save, ZoomIn, ZoomOut, Maximize, Minimize } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -44,6 +44,8 @@ export function ResumeEditor({
   const [themeColor, setThemeColor] = useState("#377BB5");
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const previewAreaRef = useRef<HTMLDivElement>(null);
+  const [isAutoZoom, setIsAutoZoom] = useState(true);
 
   // Detect theme for CodeMirror
   const isDark =
@@ -55,6 +57,32 @@ export function ResumeEditor({
     setCss(initialCss);
     setName(initialName);
   }, [initialMarkdown, initialCss, initialName]);
+
+  // Add: recompute zoom to fit width of preview area
+  const recomputeZoom = () => {
+    if (!previewAreaRef.current) return;
+    // Paper width in px (match PreviewPanel logic)
+    const contentWidthPx = paperSize === "A4" ? 210 * 3.7795275591 : 8.5 * 96;
+    const availableWidth = previewAreaRef.current.clientWidth;
+    if (!availableWidth || !contentWidthPx) return;
+    const next = Math.min(1, availableWidth / contentWidthPx);
+    setZoom(Number(next.toFixed(2)));
+  };
+
+  useEffect(() => {
+    if (!isAutoZoom) return;
+    const el = previewAreaRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver(() => {
+      if (isAutoZoom) recomputeZoom();
+    });
+    ro.observe(el);
+    // initial compute
+    recomputeZoom();
+
+    return () => ro.disconnect();
+  }, [isAutoZoom, paperSize]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -122,9 +150,19 @@ export function ResumeEditor({
   };
 
   const clamp = (v: number, min = 0.5, max = 2) => Math.min(max, Math.max(min, v));
-  const handleZoomIn = () => setZoom((z) => clamp(Number((z + 0.1).toFixed(2))));
-  const handleZoomOut = () => setZoom((z) => clamp(Number((z - 0.1).toFixed(2))));
-  const handleZoomReset = () => setZoom(1);
+  const handleZoomIn = () => {
+    setIsAutoZoom(false);
+    setZoom((z) => clamp(Number((z + 0.1).toFixed(2))));
+  };
+  const handleZoomOut = () => {
+    setIsAutoZoom(false);
+    setZoom((z) => clamp(Number((z - 0.1).toFixed(2))));
+  };
+  const handleZoomReset = () => {
+    setIsAutoZoom(true);
+    // Recompute to fit width
+    recomputeZoom();
+  };
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -235,7 +273,7 @@ export function ResumeEditor({
         </div>
 
         {/* Preview */}
-        <div className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
+        <div ref={previewAreaRef} className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
           <div className="mb-3 flex items-center justify-end gap-2">
             <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
               <ZoomOut className="h-4 w-4" />
