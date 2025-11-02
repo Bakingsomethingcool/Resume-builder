@@ -26,21 +26,37 @@ export function PreviewPanel({
     if (typeof window !== "undefined" && window.marked) {
       return window.marked.parse(markdown, { gfm: true, breaks: true });
     }
-    return "Error: Markdown parser not loaded.";
+    return "<p>Error: Markdown parser not loaded.</p>";
   }, [markdown]);
 
-  // Inject CSS with theme color so `var(--theme-color)` can be used
+  // Inject CSS with theme color
   const finalCss = useMemo(() => {
-    return `:root { --theme-color: ${themeColor}; }\n${css}`;
+    return `
+      :root { 
+        --theme-color: ${themeColor}; 
+      }
+      
+      #resume-preview {
+        background-color: white;
+        color: black;
+        padding: 2.5rem;
+        min-height: 100%;
+      }
+      
+      .dark #resume-preview {
+        background-color: hsl(213, 12%, 15%);
+        color: hsl(216, 12%, 84%);
+      }
+      
+      ${css}
+    `;
   }, [css, themeColor]);
 
-  // Render the HTML string within #resume-preview for scoping the styles
   return (
     <div className={`preview-wrapper ${className}`}>
       <style>{finalCss}</style>
       <div 
-        id="resume-preview" 
-        className="p-10"
+        id="resume-preview"
         dangerouslySetInnerHTML={{ __html: parsedHtml }} 
       />
     </div>

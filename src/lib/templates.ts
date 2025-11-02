@@ -32,98 +32,55 @@ export const templates: Template[] = [
 
 ## Skills
 JavaScript, TypeScript, React, Node.js, Python, SQL`,
-    css: `/* Backbone CSS for Resume Template */
-#resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: white;
-  color: black;
-  text-align: justify;
-  -moz-hyphens: auto;
-  -ms-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+    css: `#resume-preview {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
 }
-#resume-preview p,
-#resume-preview li,
-#resume-preview dl {
-  margin: 0;
-}
-#resume-preview h1,
-#resume-preview h2,
-#resume-preview h3 {
-  font-weight: bold;
-}
+
 #resume-preview h1 {
-  font-size: 2.13em;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  line-height: 1.2;
 }
-#resume-preview h2,
-#resume-preview h3 {
-  margin-bottom: 5px;
-  font-size: 1.2em;
-}
+
 #resume-preview h2 {
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: var(--theme-color);
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--theme-color);
 }
-#resume-preview ul,
-#resume-preview ol {
-  padding-left: 1.5em;
-  margin: 0.2em 0;
+
+#resume-preview h3 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
 }
+
+#resume-preview p {
+  margin: 0.5em 0;
+}
+
+#resume-preview strong {
+  font-weight: 600;
+}
+
 #resume-preview ul {
-  list-style-type: circle;
+  margin: 0.5em 0;
+  padding-left: 1.5em;
 }
-#resume-preview ol {
-  list-style-type: decimal;
+
+#resume-preview li {
+  margin: 0.3em 0;
 }
-#resume-preview dl {
-  display: flex;
-}
-#resume-preview dl dt,
-#resume-preview dl dd:not(:last-child) {
-  flex: 1;
-}
-#resume-preview :not(span.katex-display) > span.katex {
-  font-size: 1em !important;
-}
-#resume-preview svg.iconify {
-  vertical-align: -0.2em;
-}
-#resume-preview img {
-  max-width: 100%;
-}
-#resume-preview .resume-header {
-  text-align: center;
-}
-#resume-preview .resume-header h1 {
-  text-align: center;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-#resume-preview .resume-header-item:not(.no-separator)::after {
-  content: " | ";
-}
-#resume-preview [data-scope="cross-ref"][data-part="definitions"] {
-  padding-left: 1.2em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"] p {
-  margin-left: 0.5em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"]::marker {
-  content: attr(data-label);
-}
-#resume-preview [data-scope="cross-ref"][data-part="reference"] {
-  font-size: 100%;
-  top: 0;
-}
-.dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: hsl(213, 12%, 15%);
-  color: hsl(216, 12%, 84%);
-}
+
 @media print {
-  .dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-    background-color: white;
-    color: black;
+  #resume-preview {
+    background-color: white !important;
+    color: black !important;
   }
 }`,
   },
@@ -162,98 +119,66 @@ State University | 2013
 ## Certifications
 - PMP Certified
 - Scrum Master Certified`,
-    css: `/* Backbone CSS for Resume Template */
-#resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: white;
-  color: black;
-  text-align: justify;
-  -moz-hyphens: auto;
-  -ms-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+    css: `#resume-preview {
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.7;
 }
-#resume-preview p,
-#resume-preview li,
-#resume-preview dl {
-  margin: 0;
-}
-#resume-preview h1,
-#resume-preview h2,
-#resume-preview h3 {
-  font-weight: bold;
-}
+
 #resume-preview h1 {
-  font-size: 2.13em;
+  font-size: 2.8em;
+  font-weight: bold;
+  margin-bottom: 0.3em;
+  text-align: center;
 }
-#resume-preview h2,
-#resume-preview h3 {
-  margin-bottom: 5px;
-  font-size: 1.2em;
-}
+
 #resume-preview h2 {
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: var(--theme-color);
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.2em;
+  border-bottom: 2px solid var(--theme-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-#resume-preview ul,
-#resume-preview ol {
-  padding-left: 1.5em;
-  margin: 0.2em 0;
+
+#resume-preview h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.2em;
 }
+
+#resume-preview p {
+  margin: 0.5em 0;
+  text-align: justify;
+}
+
+#resume-preview em {
+  color: #666;
+  font-style: italic;
+}
+
+.dark #resume-preview em {
+  color: #aaa;
+}
+
 #resume-preview ul {
-  list-style-type: circle;
+  margin: 0.5em 0;
+  padding-left: 1.5em;
 }
-#resume-preview ol {
-  list-style-type: decimal;
+
+#resume-preview li {
+  margin: 0.3em 0;
 }
-#resume-preview dl {
-  display: flex;
-}
-#resume-preview dl dt,
-#resume-preview dl dd:not(:last-child) {
-  flex: 1;
-}
-#resume-preview :not(span.katex-display) > span.katex {
-  font-size: 1em !important;
-}
-#resume-preview svg.iconify {
-  vertical-align: -0.2em;
-}
-#resume-preview img {
-  max-width: 100%;
-}
-#resume-preview .resume-header {
-  text-align: center;
-}
-#resume-preview .resume-header h1 {
-  text-align: center;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-#resume-preview .resume-header-item:not(.no-separator)::after {
-  content: " | ";
-}
-#resume-preview [data-scope="cross-ref"][data-part="definitions"] {
-  padding-left: 1.2em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"] p {
-  margin-left: 0.5em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"]::marker {
-  content: attr(data-label);
-}
-#resume-preview [data-scope="cross-ref"][data-part="reference"] {
-  font-size: 100%;
-  top: 0;
-}
-.dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: hsl(213, 12%, 15%);
-  color: hsl(216, 12%, 84%);
-}
+
 @media print {
-  .dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-    background-color: white;
-    color: black;
+  #resume-preview {
+    background-color: white !important;
+    color: black !important;
+  }
+  #resume-preview em {
+    color: #666 !important;
   }
 }`,
   },
@@ -291,98 +216,72 @@ Created user interfaces and conducted user research for mobile applications.
 Design: Figma, Sketch, Adobe Creative Suite
 Prototyping: Framer, Principle
 Research: User interviews, A/B testing`,
-    css: `/* Backbone CSS for Resume Template */
-#resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: white;
-  color: black;
-  text-align: justify;
-  -moz-hyphens: auto;
-  -ms-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+    css: `#resume-preview {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
 }
-#resume-preview p,
-#resume-preview li,
-#resume-preview dl {
-  margin: 0;
-}
-#resume-preview h1,
-#resume-preview h2,
-#resume-preview h3 {
-  font-weight: bold;
-}
+
 #resume-preview h1 {
-  font-size: 2.13em;
+  font-size: 3em;
+  font-weight: 800;
+  margin-bottom: 0.2em;
+  letter-spacing: -0.02em;
 }
-#resume-preview h2,
-#resume-preview h3 {
-  margin-bottom: 5px;
-  font-size: 1.2em;
-}
+
 #resume-preview h2 {
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: var(--theme-color);
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  color: var(--theme-color);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
-#resume-preview ul,
-#resume-preview ol {
-  padding-left: 1.5em;
-  margin: 0.2em 0;
+
+#resume-preview h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
 }
+
+#resume-preview p {
+  margin: 0.8em 0;
+}
+
+#resume-preview strong {
+  font-weight: 600;
+}
+
+#resume-preview hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 1.5em 0;
+}
+
+.dark #resume-preview hr {
+  border-top-color: #444;
+}
+
 #resume-preview ul {
-  list-style-type: circle;
+  margin: 0.5em 0;
+  padding-left: 1.5em;
 }
-#resume-preview ol {
-  list-style-type: decimal;
+
+#resume-preview li {
+  margin: 0.3em 0;
 }
-#resume-preview dl {
-  display: flex;
-}
-#resume-preview dl dt,
-#resume-preview dl dd:not(:last-child) {
-  flex: 1;
-}
-#resume-preview :not(span.katex-display) > span.katex {
-  font-size: 1em !important;
-}
-#resume-preview svg.iconify {
-  vertical-align: -0.2em;
-}
-#resume-preview img {
-  max-width: 100%;
-}
-#resume-preview .resume-header {
-  text-align: center;
-}
-#resume-preview .resume-header h1 {
-  text-align: center;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-#resume-preview .resume-header-item:not(.no-separator)::after {
-  content: " | ";
-}
-#resume-preview [data-scope="cross-ref"][data-part="definitions"] {
-  padding-left: 1.2em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"] p {
-  margin-left: 0.5em;
-}
-#resume-preview [data-scope="cross-ref"][data-part="definition"]::marker {
-  content: attr(data-label);
-}
-#resume-preview [data-scope="cross-ref"][data-part="reference"] {
-  font-size: 100%;
-  top: 0;
-}
-.dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-  background-color: hsl(213, 12%, 15%);
-  color: hsl(216, 12%, 84%);
-}
+
 @media print {
-  .dark #resume-preview [data-scope="vue-smart-pages"][data-part="page"] {
-    background-color: white;
-    color: black;
+  #resume-preview {
+    background-color: white !important;
+    color: black !important;
+  }
+  #resume-preview h2 {
+    color: #377BB5 !important;
+  }
+  #resume-preview hr {
+    border-top-color: #ddd !important;
   }
 }`,
   },
