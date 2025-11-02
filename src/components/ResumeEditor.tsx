@@ -54,8 +54,14 @@ const isDark =
   document.documentElement.classList.contains("dark");
 
   useEffect(() => {
+    setMarkdown(initialMarkdown);
+    setCss(initialCss);
+    setName(initialName);
+  }, [initialMarkdown, initialCss, initialName]);
+
+  useEffect(() => {
     updatePreview();
-  }, [markdown, css]);
+  }, [markdown, css, themeColor]);
 
   const updatePreview = () => {
     if (!previewRef.current) return;
@@ -73,7 +79,6 @@ const isDark =
       </html>
     `;
     const iframe = previewRef.current;
-    // Use srcdoc to reliably inject HTML + CSS so styles always apply
     iframe.srcdoc = fullHtml;
   };
 
@@ -192,7 +197,7 @@ const isDark =
                   <CodeMirror
                     value={markdown}
                     extensions={[markdownLang()]}
-                    theme={oneDark}
+                    theme={isDark ? oneDark : undefined}
                     onChange={(value: string) => setMarkdown(value)}
                     height="100%"
                   />
@@ -208,7 +213,7 @@ const isDark =
                   <CodeMirror
                     value={css}
                     extensions={[cssLang()]}
-                    theme={oneDark}
+                    theme={isDark ? oneDark : undefined}
                     onChange={(value: string) => setCss(value)}
                     height="100%"
                   />
@@ -241,35 +246,23 @@ const isDark =
             <h3 className="text-sm font-semibold mb-2">File</h3>
             <div className="space-y-2">
               <Button size="sm" className="w-full" onClick={handleSave} disabled={isSaving}>
+                <Save className="h-4 w-4 mr-2" />
                 {isSaving ? "Saving..." : "Save"}
               </Button>
-              {!isRenaming ? (
-                <Button size="sm" variant="outline" className="w-full" onClick={() => setIsRenaming(true)}>
-                  Rename
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="flex-1"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleRename();
-                      if (e.key === "Escape") setIsRenaming(false);
-                    }}
-                  />
-                  <Button size="sm" onClick={handleRename}>Save</Button>
-                </div>
-              )}
+              <Button size="sm" variant="outline" className="w-full" onClick={() => setIsRenaming(true)}>
+                Rename
+              </Button>
               <Separator />
               <Button size="sm" variant="outline" className="w-full" onClick={exportToPDF}>
+                <Download className="h-4 w-4 mr-2" />
                 Export PDF
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={exportMarkdown}>
+                <FileDown className="h-4 w-4 mr-2" />
                 Export Markdown
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={importMarkdown}>
+                <FileUp className="h-4 w-4 mr-2" />
                 Import Markdown
               </Button>
             </div>
@@ -281,7 +274,7 @@ const isDark =
             <h3 className="text-sm font-semibold mb-2">Paper Size</h3>
             <Select value={paperSize} onValueChange={(v) => setPaperSize(v as "A4" | "Letter")}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select size" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="A4">A4</SelectItem>
