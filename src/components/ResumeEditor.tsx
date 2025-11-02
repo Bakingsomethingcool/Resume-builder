@@ -294,19 +294,21 @@ export function ResumeEditor({
             </Button>
           </div>
 
-          <div
-            className="mx-auto"
-            style={{
-              transform: `scale(${zoom})`,
-              transformOrigin: "top center",
-            }}
-          >
-            <PreviewPanel 
-              markdown={markdown} 
-              css={css} 
-              themeColor={themeColor}
-              paperSize={paperSize}
-            />
+          {/* Center the preview horizontally */}
+          <div className="w-full flex justify-center">
+            <div
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: "top center",
+              }}
+            >
+              <PreviewPanel 
+                markdown={markdown} 
+                css={css} 
+                themeColor={themeColor}
+                paperSize={paperSize}
+              />
+            </div>
           </div>
         </div>
 
