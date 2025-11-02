@@ -61,7 +61,7 @@ const isDark =
 
   useEffect(() => {
     updatePreview();
-  }, [markdown, css, themeColor]);
+  }, [markdown, css, themeColor, paperSize]);
 
   const updatePreview = () => {
     if (!previewRef.current) return;
@@ -71,7 +71,7 @@ const isDark =
       <html>
         <head>
           <meta charset="utf-8" />
-          <style>html,body{margin:0;padding:0;}</style>
+          <style>html,body{margin:0;padding:0;overflow:hidden;height:100%;}</style>
           <style>:root{--theme-color:${themeColor};}</style>
           <style>${css}</style>
         </head>
@@ -235,7 +235,7 @@ const isDark =
               ref={previewRef}
               title="Resume Preview"
               className="w-full border-0 rounded-xl"
-              style={{ minHeight: `${PAPER_SIZES[paperSize].height}px` }}
+              style={{ height: `${PAPER_SIZES[paperSize].height}px` }}
             />
           </div>
         </div>
