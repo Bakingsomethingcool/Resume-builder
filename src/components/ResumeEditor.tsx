@@ -6,7 +6,6 @@ import CodeMirror from "@uiw/react-codemirror";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
 import { css as cssLang } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { markdownToHtml } from "@/lib/markdown-to-html";
 import { Download, FileDown, FileUp, Save, ZoomIn, ZoomOut, Maximize, Minimize } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -45,27 +44,27 @@ export function ResumeEditor({
   const [themeColor, setThemeColor] = useState("#377BB5");
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  // Add: track total content height (sum of all pages)
-  const [contentHeight, setContentHeight] = useState<number>(paperSize === "A4" ? 1123 : 1056);
+  const [contentHeight, setContentHeight] = useState<number>(1123);
+  
   const PAPER_SIZES = {
     A4: { width: 794, height: 1123 },
     Letter: { width: 816, height: 1056 },
   } as const;
 
-// Detect theme for CodeMirror
-const isDark =
-  typeof document !== "undefined" &&
-  document.documentElement.classList.contains("dark");
+  // Detect theme for CodeMirror
+  const isDark =
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark");
 
-// Build the full HTML used in preview/printing
-const getPreviewHtml = () => {
-  const html =
-    typeof window !== "undefined" && (window as any).marked
-      ? (window as any).marked.parse(markdown, { gfm: true, breaks: true })
-      : markdownToHtml(markdown);
-  const size = PAPER_SIZES[paperSize];
-  const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
-  return `
+  // Build the full HTML used in preview/printing
+  const getPreviewHtml = () => {
+    const html =
+      typeof window !== "undefined" && (window as any).marked
+        ? (window as any).marked.parse(markdown, { gfm: true, breaks: true })
+        : markdown;
+    const size = PAPER_SIZES[paperSize];
+    const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
+    return `
       <!DOCTYPE html>
       <html>
         <head>
@@ -84,13 +83,11 @@ const getPreviewHtml = () => {
               background: #fff;
               box-shadow: 0 2px 8px rgba(0,0,0,0.08);
               border: 1px solid #e5e7eb;
-              overflow: hidden; /* keep each page scoped */
+              overflow: hidden;
             }
             .page-content {
-              /* Provide reasonable defaults so most body-based templates still look good */
               box-sizing: border-box;
               width: 100%;
-              /* Remove fixed height so natural content height can be measured correctly for pagination */
               padding: var(--page-padding);
               color: #1a1a1a;
               line-height: 1.6;
@@ -126,16 +123,13 @@ const getPreviewHtml = () => {
               const pagesRoot = document.getElementById('pages');
               if (!source || !pagesRoot) return;
 
-              // Clear previous pages
               pagesRoot.innerHTML = '';
 
               const pageHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-height')) || 1123;
-              const pagePadding = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-padding')) || 40;
 
               function createPage() {
                 const page = document.createElement('div');
                 page.className = 'page';
-                // Add data attributes for compatibility with backbone CSS selectors
                 page.setAttribute('data-scope', 'vue-smart-pages');
                 page.setAttribute('data-part', 'page');
                 const content = document.createElement('div');
@@ -147,12 +141,10 @@ const getPreviewHtml = () => {
 
               let currentPage = createPage();
 
-              // Move nodes one by one to pages
               while (source.firstChild) {
                 const node = source.firstChild;
                 currentPage.appendChild(node);
 
-                // If the page content exceeds the page box height, move node to next page
                 if (currentPage.scrollHeight > pageHeight) {
                   currentPage.removeChild(node);
                   currentPage = createPage();
@@ -160,7 +152,6 @@ const getPreviewHtml = () => {
                 }
               }
 
-              // Report total content height to parent for sizing (same-origin)
               const totalHeight = pagesRoot.scrollHeight;
               try {
                 window.parent.postMessage({ type: 'resume-preview-height', height: totalHeight }, '*');
@@ -170,7 +161,7 @@ const getPreviewHtml = () => {
         </body>
       </html>
     `;
-};
+  };
 
   useEffect(() => {
     setMarkdown(initialMarkdown);
@@ -187,7 +178,6 @@ const getPreviewHtml = () => {
     const fullHtml = getPreviewHtml();
     const iframe = previewRef.current;
 
-    // Listen for height messages from the iframe to resize the preview to fit all pages
     const onMessage = (e: MessageEvent) => {
       if (e.data && e.data.type === "resume-preview-height") {
         const height = typeof e.data.height === "number" ? e.data.height : undefined;
@@ -198,10 +188,8 @@ const getPreviewHtml = () => {
     };
     window.addEventListener("message", onMessage, { once: true });
 
-    // Set document
     iframe.srcdoc = fullHtml;
 
-    // Fallback in case postMessage doesn't fire
     iframe.onload = () => {
       try {
         const doc = iframe.contentDocument;
@@ -244,7 +232,6 @@ const getPreviewHtml = () => {
     try {
       const fullHtml = getPreviewHtml();
 
-      // Create a hidden iframe to render just the resume HTML for printing
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
       iframe.style.right = "0";
@@ -279,10 +266,8 @@ const getPreviewHtml = () => {
 
       iframe.onload = triggerPrint;
 
-      // Prefer srcdoc for same-origin content and faster load
       try {
         (iframe as any).srcdoc = fullHtml;
-        // Fallback in case onload doesn't fire for srcdoc in some browsers
         setTimeout(() => {
           try {
             if (iframe.contentDocument?.readyState === "complete") {
@@ -291,7 +276,6 @@ const getPreviewHtml = () => {
           } catch {}
         }, 600);
       } catch {
-        // Fallback to Blob URL if srcdoc is not supported
         const blob = new Blob([fullHtml], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         iframe.src = url;
@@ -335,16 +319,13 @@ const getPreviewHtml = () => {
     input.click();
   };
 
-  // Helpers for zoom controls
   const clamp = (v: number, min = 0.5, max = 2) => Math.min(max, Math.max(min, v));
   const handleZoomIn = () => setZoom((z) => clamp(Number((z + 0.1).toFixed(2))));
   const handleZoomOut = () => setZoom((z) => clamp(Number((z - 0.1).toFixed(2))));
   const handleZoomReset = () => setZoom(1);
 
-  // Add keyboard shortcuts to zoom preview only (prevent browser zoom)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      // Ignore if focused in inputs/textareas or content editable
       const target = e.target as HTMLElement | null;
       if (target) {
         const tag = target.tagName?.toLowerCase();
@@ -453,7 +434,6 @@ const getPreviewHtml = () => {
 
         {/* Preview */}
         <div className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
-          {/* Toolbar above preview */}
           <div className="mb-3 flex items-center justify-end gap-2">
             <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
               <ZoomOut className="h-4 w-4" />
@@ -477,7 +457,6 @@ const getPreviewHtml = () => {
           {(() => {
             const size = PAPER_SIZES[paperSize];
             const scaledWidth = size.width * zoom;
-            // Use measured contentHeight to fit all pages
             const scaledHeight = contentHeight * zoom;
             return (
               <div
@@ -536,7 +515,6 @@ const getPreviewHtml = () => {
 
           <Separator />
 
-          {/* Preview Controls */}
           <div>
             <h3 className="text-sm font-semibold mb-2">Preview</h3>
             <div className="flex items-center gap-2">

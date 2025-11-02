@@ -21,7 +21,7 @@ export function PreviewPanel({
   themeColor = "#377BB5",
   className,
 }: PreviewPanelProps) {
-  // 1) Convert Markdown to HTML string using marked.js if available
+  // 1) Convert Markdown to HTML string using marked.js
   const parsedHtml = useMemo(() => {
     if (typeof window !== "undefined" && window.marked) {
       return window.marked.parse(markdown, { gfm: true, breaks: true });
