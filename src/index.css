@@ -322,3 +322,34 @@
     print-color-adjust: exact;
   }
 }
+
+/* Final print-enforcement pass to ensure only the preview prints with zero padding and no scaling */
+@media print {
+  /* Print only the resume preview content */
+  body * {
+    visibility: hidden !important;
+  }
+  .preview-wrapper,
+  .preview-wrapper * {
+    visibility: visible !important;
+  }
+
+  /* Ensure the preview container itself contributes no margins/padding/transform */
+  .preview-wrapper {
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Neutralize the screen zoom wrapper so print is not scaled */
+  .preview-scale {
+    transform: none !important;
+  }
+
+  /* Hide the inline preview controls bar entirely */
+  .preview-controls {
+    display: none !important;
+  }
+}

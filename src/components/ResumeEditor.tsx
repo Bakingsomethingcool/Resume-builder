@@ -274,7 +274,7 @@ export function ResumeEditor({
 
         {/* Preview */}
         <div ref={previewAreaRef} className="flex-[1] min-w-0 bg-muted overflow-y-auto overflow-x-hidden p-6">
-          <div className="mb-3 flex items-center justify-end gap-2">
+          <div className="mb-3 flex items-center justify-end gap-2 preview-controls">
             <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
               <ZoomOut className="h-4 w-4" />
             </Button>
@@ -297,6 +297,7 @@ export function ResumeEditor({
           {/* Center the preview horizontally */}
           <div className="w-full flex justify-center">
             <div
+              className="preview-scale"
               style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: "top center",
@@ -427,6 +428,7 @@ export function ResumeEditor({
 
           <div className="w-full h-full overflow-y-auto overflow-x-hidden p-6 flex justify-center items-start">
             <div
+              className="preview-scale"
               style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: "top center",
