@@ -285,4 +285,233 @@ Research: User interviews, A/B testing`,
   }
 }`,
   },
+  {
+    id: "sidebar",
+    name: "Sidebar",
+    markdown: `# RICHARD SANCHEZ
+**MARKETING MANAGER**
+
+---
+
+## CONTACT
+📞 +123-456-7890
+✉️ hello@reallygreatsite.com
+📍 123 Anywhere St., Any City
+🌐 www.reallygreatsite.com
+
+## EDUCATION
+
+### 2029 - 2030
+**WARDIERE UNIVERSITY**
+- Master of Business Management
+
+### 2025 - 2029
+**WARDIERE UNIVERSITY**
+- Bachelor of Business
+- GPA: 3.8 / 4.0
+
+## SKILLS
+- Project Management
+- Public Relations
+- Teamwork
+- Time Management
+- Leadership
+- Effective Communication
+- Critical Thinking
+
+## LANGUAGES
+- English (Fluent)
+- French (Fluent)
+- German (Basics)
+- Spanish (Intermediate)
+
+---
+
+## PROFILE
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation. Lorem dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation. Ut enim ad minim veniam quis nostrud exercitation.
+
+## WORK EXPERIENCE
+
+### Borcelle Studio
+**Marketing Manager & Specialist** | 2030 - PRESENT
+
+- Develop and execute comprehensive marketing strategies and campaigns that align with the company's goals and objectives.
+- Lead, mentor, and manage a high-performing marketing team, fostering a collaborative and results-driven work environment.
+- Monitor brand consistency across marketing channels and materials.
+
+### Fauget Studio
+**Marketing Manager & Specialist** | 2025 - 2029
+
+- Create and manage the marketing budget, ensuring efficient allocation of resources and maximizing ROI.
+- Oversee market research to identify emerging trends, customer needs, and competitive strategies.
+- Monitor brand consistency across marketing channels and materials.
+
+### Studio Shodwe
+**Marketing Manager & Specialist** | 2024 - 2025
+
+- Develop and maintain strong relationships with partners, agencies, and vendors to support marketing initiatives.
+- Monitor and maintain brand consistency across all marketing channels and materials.
+
+## REFERENCE
+
+**Estelle Darcy**
+Wardiere Inc. / CTO
+Phone: 123-456-7890
+Email: hello@reallygreatsite.com
+
+**Harper Richard**
+Wardiere Inc. / CEO
+Phone: 123-456-7890
+Email: hello@reallygreatsite.com`,
+    css: `#resume-preview {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 0;
+  min-height: 100%;
+}
+
+/* Sidebar styling */
+#resume-preview > *:nth-child(-n+4),
+#resume-preview > hr:first-of-type {
+  background-color: #1e3a5f;
+  color: white;
+  padding: 1.5rem;
+  margin: 0;
+}
+
+.dark #resume-preview > *:nth-child(-n+4),
+.dark #resume-preview > hr:first-of-type {
+  background-color: #152840;
+}
+
+/* Main content area */
+#resume-preview > *:nth-child(n+5) {
+  padding: 1.5rem 2rem;
+  margin: 0;
+}
+
+/* Header in sidebar */
+#resume-preview h1 {
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.2em 0;
+  color: white;
+  grid-column: 1;
+}
+
+#resume-preview h1 + p strong {
+  font-size: 1.1em;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #b8c5d6;
+}
+
+/* Section headers in sidebar */
+#resume-preview > *:nth-child(-n+4) h2 {
+  font-size: 1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin: 1.5em 0 0.8em 0;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid white;
+  color: white;
+}
+
+/* Section headers in main content */
+#resume-preview > *:nth-child(n+5) h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 1.5em 0 0.8em 0;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--theme-color);
+  color: var(--theme-color);
+}
+
+/* Subsection headers */
+#resume-preview h3 {
+  font-size: 1.1em;
+  font-weight: 700;
+  margin: 1em 0 0.3em 0;
+  color: inherit;
+}
+
+/* Sidebar content */
+#resume-preview > *:nth-child(-n+4) p,
+#resume-preview > *:nth-child(-n+4) ul {
+  color: #e8eef5;
+  font-size: 0.95em;
+}
+
+/* Main content */
+#resume-preview p {
+  margin: 0.5em 0;
+  text-align: justify;
+}
+
+#resume-preview strong {
+  font-weight: 600;
+}
+
+/* Lists */
+#resume-preview ul {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+  list-style: none;
+}
+
+#resume-preview li {
+  margin: 0.4em 0;
+  position: relative;
+  padding-left: 0.5em;
+}
+
+#resume-preview > *:nth-child(n+5) li:before {
+  content: "▪";
+  position: absolute;
+  left: -1em;
+  color: var(--theme-color);
+}
+
+/* Horizontal rules */
+#resume-preview hr {
+  border: none;
+  margin: 0;
+  grid-column: 1 / -1;
+}
+
+/* Reference section styling */
+#resume-preview > *:last-child p {
+  display: inline-block;
+  width: 48%;
+  vertical-align: top;
+  margin-right: 2%;
+}
+
+@media print {
+  #resume-preview {
+    background-color: white !important;
+  }
+  
+  #resume-preview > *:nth-child(-n+4),
+  #resume-preview > hr:first-of-type {
+    background-color: #1e3a5f !important;
+    color: white !important;
+  }
+  
+  #resume-preview > *:nth-child(n+5) {
+    color: black !important;
+  }
+  
+  #resume-preview > *:nth-child(n+5) h2 {
+    color: #1e3a5f !important;
+    border-bottom-color: #1e3a5f !important;
+  }
+}`,
+  },
 ];
