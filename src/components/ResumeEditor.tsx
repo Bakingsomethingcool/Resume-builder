@@ -135,6 +135,9 @@ const getPreviewHtml = () => {
               function createPage() {
                 const page = document.createElement('div');
                 page.className = 'page';
+                // Add data attributes for compatibility with backbone CSS selectors
+                page.setAttribute('data-scope', 'vue-smart-pages');
+                page.setAttribute('data-part', 'page');
                 const content = document.createElement('div');
                 content.className = 'page-content';
                 page.appendChild(content);
