@@ -130,15 +130,29 @@
   body {
     margin: 0;
     padding: 0;
+    background: white;
   }
   
-  /* Hide everything except the preview */
-  body > *:not(#root) {
+  /* Hide all UI elements - be very aggressive */
+  body > *:not(#root),
+  header,
+  nav,
+  aside,
+  footer,
+  button,
+  .border-b,
+  [class*="border"],
+  [class*="toolbar"] {
     display: none !important;
   }
   
-  #root > *:not(.preview-wrapper) {
+  /* Hide everything in root except preview wrapper */
+  #root > * {
     display: none !important;
+  }
+  
+  #root .preview-wrapper {
+    display: block !important;
   }
   
   /* Show only the preview wrapper */
@@ -148,16 +162,31 @@
     transform: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
   }
   
   /* Ensure pages print correctly */
   .page {
     page-break-after: always;
     margin: 0 !important;
+    padding: 2.5rem !important;
     box-shadow: none !important;
+    background: white !important;
+    color: black !important;
   }
   
   .page:last-child {
     page-break-after: auto;
+  }
+  
+  /* Force all text to be black for print */
+  .page * {
+    color: black !important;
+  }
+  
+  /* Preserve theme color for headings */
+  .page h2 {
+    color: #377BB5 !important;
+    border-bottom-color: #377BB5 !important;
   }
 }
