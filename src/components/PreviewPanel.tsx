@@ -150,18 +150,25 @@ export function PreviewPanel({
     tempDiv.style.width = paperSize === "A4" ? "210mm" : "8.5in";
     document.body.appendChild(tempDiv);
 
+    // Create a measuring wrapper with the correct scope so #resume-preview selectors apply
+    const measureWrapper = document.createElement("div");
+    measureWrapper.id = "resume-preview";
+    measureWrapper.style.visibility = "hidden";
+    measureWrapper.style.position = "absolute";
+    measureWrapper.style.left = "-99999px";
+    measureWrapper.style.top = "0";
+    measureWrapper.style.width = paperSize === "A4" ? "210mm" : "8.5in";
+    document.body.appendChild(measureWrapper);
+
     // Create a measuring page to accumulate nodes and measure real layout height (including margins)
     const measurePage = document.createElement("div");
     measurePage.className = "page";
-    measurePage.style.visibility = "hidden";
-    measurePage.style.position = "absolute";
-    measurePage.style.left = "-99999px";
-    measurePage.style.top = "0";
+    // Override fixed height for measurement so we can compare true content height against the target
+    measurePage.style.height = "auto";
     measurePage.style.width = paperSize === "A4" ? "210mm" : "8.5in";
-    document.body.appendChild(measurePage);
+    measureWrapper.appendChild(measurePage);
 
     const pages: HTMLElement[] = [];
-    let isFirstPage = true;
 
     for (const node of Array.from(tempDiv.childNodes)) {
       const clone = node.cloneNode(true);
@@ -173,10 +180,6 @@ export function PreviewPanel({
 
         const pageDiv = document.createElement("div");
         pageDiv.className = "page";
-        if (isFirstPage) {
-          pageDiv.id = "resume-preview";
-          isFirstPage = false;
-        }
         pageDiv.innerHTML = measurePage.innerHTML;
         pages.push(pageDiv);
 
@@ -190,10 +193,6 @@ export function PreviewPanel({
     if (measurePage.childNodes.length > 0) {
       const pageDiv = document.createElement("div");
       pageDiv.className = "page";
-      if (isFirstPage) {
-        pageDiv.id = "resume-preview";
-        isFirstPage = false;
-      }
       pageDiv.innerHTML = measurePage.innerHTML;
       pages.push(pageDiv);
     }
@@ -205,13 +204,14 @@ export function PreviewPanel({
 
     // Cleanup
     document.body.removeChild(tempDiv);
-    document.body.removeChild(measurePage);
+    document.body.removeChild(measureWrapper);
   }, [parsedHtml, paperSize]);
 
   return (
     <div className={`preview-wrapper ${className}`}>
       <style>{finalCss}</style>
-      <div ref={containerRef} />
+      {/* Ensure all CSS rules targeting #resume-preview apply to all pages */}
+      <div ref={containerRef} id="resume-preview" />
     </div>
   );
 }
