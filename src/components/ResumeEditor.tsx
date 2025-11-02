@@ -55,6 +55,30 @@ const isDark =
   typeof document !== "undefined" &&
   document.documentElement.classList.contains("dark");
 
+// Build the full HTML used in preview/printing
+const getPreviewHtml = () => {
+  const html = markdownToHtml(markdown);
+  const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
+  return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <style>
+            html,body{margin:0;padding:0;overflow:hidden;height:100%;}
+            @page { size: ${pageSizeCss}; margin: 0; }
+            @media print { 
+              html,body { margin:0; padding:0; }
+            }
+          </style>
+          <style>:root{--theme-color:${themeColor};}</style>
+          <style>${css}</style>
+        </head>
+        <body>${html}</body>
+      </html>
+    `;
+};
+
   useEffect(() => {
     setMarkdown(initialMarkdown);
     setCss(initialCss);
@@ -67,23 +91,7 @@ const isDark =
 
   const updatePreview = () => {
     if (!previewRef.current) return;
-    const html = markdownToHtml(markdown);
-    const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
-    const fullHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <style>
-            html,body{margin:0;padding:0;overflow:hidden;height:100%;}
-            @page { size: ${pageSizeCss}; margin: 0; }
-          </style>
-          <style>:root{--theme-color:${themeColor};}</style>
-          <style>${css}</style>
-        </head>
-        <body>${html}</body>
-      </html>
-    `;
+    const fullHtml = getPreviewHtml();
     const iframe = previewRef.current;
     iframe.srcdoc = fullHtml;
   };
@@ -115,14 +123,31 @@ const isDark =
   };
 
   const exportToPDF = () => {
-    if (!previewRef.current) return;
-    const iframe = previewRef.current;
     try {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
+      const fullHtml = getPreviewHtml();
+      const printWindow = window.open("", "_blank", "noopener,noreferrer");
+      if (!printWindow) {
+        toast.error("Pop-up blocked. Please allow pop-ups to export PDF.");
+        return;
+      }
+      printWindow.document.open();
+      printWindow.document.write(fullHtml);
+      printWindow.document.close();
+
+      const triggerPrint = () => {
+        try {
+          printWindow.focus();
+          printWindow.print();
+        } catch {
+          // No-op: if print fails, let the user manually print
+        }
+      };
+
+      // Try both onload and a short delay to ensure ready state
+      printWindow.onload = triggerPrint;
+      setTimeout(triggerPrint, 300);
     } catch {
-      // Fallback to window print if iframe print fails
-      window.print();
+      toast.error("Failed to export PDF");
     }
   };
 
