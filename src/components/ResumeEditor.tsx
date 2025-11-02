@@ -273,7 +273,7 @@ export function ResumeEditor({
         </div>
 
         {/* Preview */}
-        <div ref={previewAreaRef} className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
+        <div ref={previewAreaRef} className="flex-[1] min-w-0 bg-muted overflow-y-auto overflow-x-hidden p-6">
           <div className="mb-3 flex items-center justify-end gap-2">
             <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
               <ZoomOut className="h-4 w-4" />
@@ -423,7 +423,7 @@ export function ResumeEditor({
             </Button>
           </div>
 
-          <div className="w-full h-full overflow-auto p-6 flex justify-center items-start">
+          <div className="w-full h-full overflow-y-auto overflow-x-hidden p-6 flex justify-center items-start">
             <div
               style={{
                 transform: `scale(${zoom})`,
