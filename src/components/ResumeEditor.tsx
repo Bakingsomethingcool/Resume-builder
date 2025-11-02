@@ -125,29 +125,65 @@ const getPreviewHtml = () => {
   const exportToPDF = () => {
     try {
       const fullHtml = getPreviewHtml();
-      const printWindow = window.open("", "_blank", "noopener,noreferrer");
-      if (!printWindow) {
-        toast.error("Pop-up blocked. Please allow pop-ups to export PDF.");
-        return;
-      }
-      printWindow.document.open();
-      printWindow.document.write(fullHtml);
-      printWindow.document.close();
+
+      // Create a hidden iframe to render just the resume HTML for printing
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      document.body.appendChild(iframe);
+
+      const cleanup = () => {
+        setTimeout(() => {
+          try {
+            iframe.remove();
+          } catch {}
+        }, 1000);
+      };
 
       const triggerPrint = () => {
         try {
-          printWindow.focus();
-          printWindow.print();
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          toast.success("Print dialog opened. Choose 'Save as PDF' to export.");
         } catch {
-          // No-op: if print fails, let the user manually print
+          toast.error("Could not open print dialog. Please use your browser's Print (Ctrl/Cmd+P).");
+          try {
+            window.print();
+          } catch {}
+        } finally {
+          cleanup();
         }
       };
 
-      // Try both onload and a short delay to ensure ready state
-      printWindow.onload = triggerPrint;
-      setTimeout(triggerPrint, 300);
+      iframe.onload = triggerPrint;
+
+      // Prefer srcdoc for same-origin content and faster load
+      try {
+        (iframe as any).srcdoc = fullHtml;
+        // Fallback in case onload doesn't fire for srcdoc in some browsers
+        setTimeout(() => {
+          try {
+            if (iframe.contentDocument?.readyState === "complete") {
+              triggerPrint();
+            }
+          } catch {}
+        }, 600);
+      } catch {
+        // Fallback to Blob URL if srcdoc is not supported
+        const blob = new Blob([fullHtml], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        iframe.src = url;
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }
     } catch {
-      toast.error("Failed to export PDF");
+      toast.error("Failed to prepare resume for printing. Please use your browser's Print (Ctrl/Cmd+P).");
+      try {
+        window.print();
+      } catch {}
     }
   };
 
