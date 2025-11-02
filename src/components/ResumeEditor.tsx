@@ -152,6 +152,37 @@ const isDark =
   const handleZoomOut = () => setZoom((z) => clamp(Number((z - 0.1).toFixed(2))));
   const handleZoomReset = () => setZoom(1);
 
+  // Add keyboard shortcuts to zoom preview only (prevent browser zoom)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Ignore if focused in inputs/textareas or content editable
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName?.toLowerCase();
+        if (tag === "input" || tag === "textarea" || (target as any).isContentEditable) {
+          return;
+        }
+      }
+
+      const cmdOrCtrl = e.metaKey || e.ctrlKey;
+      if (!cmdOrCtrl) return;
+
+      if (e.key === "=" || e.key === "+") {
+        e.preventDefault();
+        handleZoomIn();
+      } else if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        handleZoomOut();
+      } else if (e.key === "0") {
+        e.preventDefault();
+        handleZoomReset();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
