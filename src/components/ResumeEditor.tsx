@@ -59,7 +59,10 @@ const isDark =
 
 // Build the full HTML used in preview/printing
 const getPreviewHtml = () => {
-  const html = markdownToHtml(markdown);
+  const html =
+    typeof window !== "undefined" && (window as any).marked
+      ? (window as any).marked.parse(markdown, { gfm: true, breaks: true })
+      : markdownToHtml(markdown);
   const size = PAPER_SIZES[paperSize];
   const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
   return `
