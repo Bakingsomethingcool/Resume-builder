@@ -10,6 +10,14 @@ import { markdownToHtml } from "@/lib/markdown-to-html";
 import { Download, FileDown, FileUp, Save } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ResumeEditorProps {
   resumeId?: string;
@@ -33,6 +41,13 @@ export function ResumeEditor({
   const [isRenaming, setIsRenaming] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const previewRef = useRef<HTMLIFrameElement>(null);
+  const [paperSize, setPaperSize] = useState<"A4" | "Letter">("A4");
+  const [themeColor, setThemeColor] = useState("#377BB5");
+  const PAPER_SIZES = {
+    A4: { width: 794, height: 1123 },
+    Letter: { width: 816, height: 1056 },
+  } as const;
+
 // Detect theme for CodeMirror
 const isDark =
   typeof document !== "undefined" &&
@@ -51,6 +66,7 @@ const isDark =
         <head>
           <meta charset="utf-8" />
           <style>html,body{margin:0;padding:0;}</style>
+          <style>:root{--theme-color:${themeColor};}</style>
           <style>${css}</style>
         </head>
         <body>${html}</body>
@@ -156,30 +172,12 @@ const isDark =
             </h2>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={importMarkdown}>
-            <FileUp className="h-4 w-4 mr-2" />
-            Import
-          </Button>
-          <Button size="sm" variant="outline" onClick={exportMarkdown}>
-            <FileDown className="h-4 w-4 mr-2" />
-            Export MD
-          </Button>
-          <Button size="sm" variant="outline" onClick={exportToPDF}>
-            <Download className="h-4 w-4 mr-2" />
-            Export PDF
-          </Button>
-          <Button size="sm" onClick={handleSave} disabled={isSaving}>
-            <Save className="h-4 w-4 mr-2" />
-            {isSaving ? "Saving..." : "Save"}
-          </Button>
-        </div>
       </div>
 
-      {/* Editor and Preview */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+      {/* Advanced Layout: Editor | Preview | Actions */}
+      <div className="flex-1 flex overflow-hidden">
         {/* Editor */}
-        <div className="border-r flex flex-col min-h-0 overflow-hidden">
+        <div className="flex-[1.15] min-w-0 border-r flex flex-col overflow-hidden">
           <Tabs defaultValue="markdown" className="flex-1 flex flex-col min-h-0">
             <TabsList className="sticky top-0 z-10 bg-background w-full justify-start rounded-none border-b">
               <TabsTrigger value="markdown">Markdown</TabsTrigger>
@@ -194,7 +192,7 @@ const isDark =
                   <CodeMirror
                     value={markdown}
                     extensions={[markdownLang()]}
-                    theme={isDark ? oneDark : undefined}
+                    theme={oneDark}
                     onChange={(value: string) => setMarkdown(value)}
                     height="100%"
                   />
@@ -210,7 +208,7 @@ const isDark =
                   <CodeMirror
                     value={css}
                     extensions={[cssLang()]}
-                    theme={isDark ? oneDark : undefined}
+                    theme={oneDark}
                     onChange={(value: string) => setCss(value)}
                     height="100%"
                   />
@@ -221,16 +219,98 @@ const isDark =
         </div>
 
         {/* Preview */}
-        <div className="bg-muted overflow-auto p-8">
-          <div className="bg-white shadow-sm mx-auto" style={{ maxWidth: "800px" }}>
+        <div className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
+          <div
+            className="bg-white shadow-sm mx-auto rounded-xl border"
+            style={{
+              width: `${PAPER_SIZES[paperSize].width}px`,
+            }}
+          >
             <iframe
               ref={previewRef}
               title="Resume Preview"
-              className="w-full border-0"
-              style={{ minHeight: "1056px" }}
+              className="w-full border-0 rounded-xl"
+              style={{ minHeight: `${PAPER_SIZES[paperSize].height}px` }}
             />
           </div>
         </div>
+
+        {/* Right Actions Sidebar */}
+        <aside className="w-80 shrink-0 border-l bg-background overflow-y-auto p-4 space-y-4">
+          <div>
+            <h3 className="text-sm font-semibold mb-2">File</h3>
+            <div className="space-y-2">
+              <Button size="sm" className="w-full" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save"}
+              </Button>
+              {!isRenaming ? (
+                <Button size="sm" variant="outline" className="w-full" onClick={() => setIsRenaming(true)}>
+                  Rename
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="flex-1"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleRename();
+                      if (e.key === "Escape") setIsRenaming(false);
+                    }}
+                  />
+                  <Button size="sm" onClick={handleRename}>Save</Button>
+                </div>
+              )}
+              <Separator />
+              <Button size="sm" variant="outline" className="w-full" onClick={exportToPDF}>
+                Export PDF
+              </Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={exportMarkdown}>
+                Export Markdown
+              </Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={importMarkdown}>
+                Import Markdown
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Paper Size</h3>
+            <Select value={paperSize} onValueChange={(v) => setPaperSize(v as "A4" | "Letter")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A4">A4</SelectItem>
+                <SelectItem value="Letter">Letter</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Theme Color</h3>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={themeColor}
+                onChange={(e) => setThemeColor(e.target.value)}
+                className="h-9 w-12 cursor-pointer rounded border"
+                aria-label="Theme color"
+              />
+              <Input
+                value={themeColor}
+                onChange={(e) => setThemeColor(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Available as CSS var: <span className="font-mono">var(--theme-color)</span>
+            </p>
+          </div>
+        </aside>
       </div>
     </div>
   );
