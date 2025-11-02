@@ -19,9 +19,9 @@ export function PreviewPanel({
   markdown,
   css,
   themeColor = "#377BB5",
-  className,
+  className = "",
 }: PreviewPanelProps) {
-  // 1) Convert Markdown to HTML string using marked.js
+  // Convert Markdown to HTML string using marked.js
   const parsedHtml = useMemo(() => {
     if (typeof window !== "undefined" && window.marked) {
       return window.marked.parse(markdown, { gfm: true, breaks: true });
@@ -29,16 +29,20 @@ export function PreviewPanel({
     return "Error: Markdown parser not loaded.";
   }, [markdown]);
 
-  // 2) Inject CSS with theme color so `var(--theme-color)` can be used
+  // Inject CSS with theme color so `var(--theme-color)` can be used
   const finalCss = useMemo(() => {
     return `:root { --theme-color: ${themeColor}; }\n${css}`;
   }, [css, themeColor]);
 
-  // 3) Render the HTML string within #resume-preview for scoping the styles
+  // Render the HTML string within #resume-preview for scoping the styles
   return (
-    <div className={className}>
+    <div className={`preview-wrapper ${className}`}>
       <style>{finalCss}</style>
-      <div id="resume-preview" dangerouslySetInnerHTML={{ __html: parsedHtml }} />
+      <div 
+        id="resume-preview" 
+        className="p-10"
+        dangerouslySetInnerHTML={{ __html: parsedHtml }} 
+      />
     </div>
   );
 }

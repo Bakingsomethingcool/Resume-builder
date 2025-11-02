@@ -7,7 +7,7 @@ import { markdown as markdownLang } from "@codemirror/lang-markdown";
 import { css as cssLang } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { Download, FileDown, FileUp, Save, ZoomIn, ZoomOut, Maximize, Minimize } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PreviewPanel } from "@/components/PreviewPanel";
 
 interface ResumeEditorProps {
   resumeId?: string;
@@ -39,168 +40,21 @@ export function ResumeEditor({
   const [name, setName] = useState(initialName);
   const [isRenaming, setIsRenaming] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const previewRef = useRef<HTMLIFrameElement>(null);
   const [paperSize, setPaperSize] = useState<"A4" | "Letter">("A4");
   const [themeColor, setThemeColor] = useState("#377BB5");
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [contentHeight, setContentHeight] = useState<number>(1123);
-  
-  const PAPER_SIZES = {
-    A4: { width: 794, height: 1123 },
-    Letter: { width: 816, height: 1056 },
-  } as const;
 
   // Detect theme for CodeMirror
   const isDark =
     typeof document !== "undefined" &&
     document.documentElement.classList.contains("dark");
 
-  // Build the full HTML used in preview/printing
-  const getPreviewHtml = () => {
-    const html =
-      typeof window !== "undefined" && (window as any).marked
-        ? (window as any).marked.parse(markdown, { gfm: true, breaks: true })
-        : markdown;
-    const size = PAPER_SIZES[paperSize];
-    const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
-    return `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <style>
-            /* Base and theme */
-            html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-            body { background: #f3f4f6; }
-            :root { --theme-color: ${themeColor}; --page-width: ${size.width}px; --page-height: ${size.height}px; --page-gap: 16px; --page-padding: 40px; }
-
-            /* Page box for on-screen preview */
-            .page {
-              width: var(--page-width);
-              height: var(--page-height);
-              margin: var(--page-gap) auto;
-              background: #fff;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-              border: 1px solid #e5e7eb;
-              overflow: hidden;
-            }
-            .page-content {
-              box-sizing: border-box;
-              width: 100%;
-              padding: var(--page-padding);
-              color: #1a1a1a;
-              line-height: 1.6;
-              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            }
-
-            /* Printing */
-            @page { size: ${pageSizeCss}; margin: 0; }
-            @media print {
-              body { background: white; }
-              .page {
-                margin: 0 auto;
-                box-shadow: none;
-                border: none;
-                page-break-after: always;
-              }
-            }
-          </style>
-          <style>${css}</style>
-        </head>
-        <body>
-          <!-- Hidden source content -->
-          <div id="source" style="position:absolute; left:-99999px; top:-99999px;">${html}</div>
-
-          <!-- Root wrapper ensures CSS selectors like '#resume-preview h1' work -->
-          <div id="resume-preview">
-            <div id="pages"></div>
-          </div>
-
-          <script>
-            (function paginate() {
-              const source = document.getElementById('source');
-              const pagesRoot = document.getElementById('pages');
-              if (!source || !pagesRoot) return;
-
-              pagesRoot.innerHTML = '';
-
-              const pageHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-height')) || 1123;
-
-              function createPage() {
-                const page = document.createElement('div');
-                page.className = 'page';
-                page.setAttribute('data-scope', 'vue-smart-pages');
-                page.setAttribute('data-part', 'page');
-                const content = document.createElement('div');
-                content.className = 'page-content';
-                page.appendChild(content);
-                pagesRoot.appendChild(page);
-                return content;
-              }
-
-              let currentPage = createPage();
-
-              while (source.firstChild) {
-                const node = source.firstChild;
-                currentPage.appendChild(node);
-
-                if (currentPage.scrollHeight > pageHeight) {
-                  currentPage.removeChild(node);
-                  currentPage = createPage();
-                  currentPage.appendChild(node);
-                }
-              }
-
-              const totalHeight = pagesRoot.scrollHeight;
-              try {
-                window.parent.postMessage({ type: 'resume-preview-height', height: totalHeight }, '*');
-              } catch (e) {}
-            })();
-          </script>
-        </body>
-      </html>
-    `;
-  };
-
   useEffect(() => {
     setMarkdown(initialMarkdown);
     setCss(initialCss);
     setName(initialName);
   }, [initialMarkdown, initialCss, initialName]);
-
-  useEffect(() => {
-    updatePreview();
-  }, [markdown, css, themeColor, paperSize, isFullscreen]);
-
-  const updatePreview = () => {
-    if (!previewRef.current) return;
-    const fullHtml = getPreviewHtml();
-    const iframe = previewRef.current;
-
-    const onMessage = (e: MessageEvent) => {
-      if (e.data && e.data.type === "resume-preview-height") {
-        const height = typeof e.data.height === "number" ? e.data.height : undefined;
-        if (height && height > 0) {
-          setContentHeight(height);
-        }
-      }
-    };
-    window.addEventListener("message", onMessage, { once: true });
-
-    iframe.srcdoc = fullHtml;
-
-    iframe.onload = () => {
-      try {
-        const doc = iframe.contentDocument;
-        const body = doc?.body;
-        if (body) {
-          const h = body.querySelector("#pages")?.scrollHeight || body.scrollHeight;
-          if (h && h > 0) setContentHeight(h);
-        }
-      } catch {}
-    };
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -230,62 +84,10 @@ export function ResumeEditor({
 
   const exportToPDF = () => {
     try {
-      const fullHtml = getPreviewHtml();
-
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      document.body.appendChild(iframe);
-
-      const cleanup = () => {
-        setTimeout(() => {
-          try {
-            iframe.remove();
-          } catch {}
-        }, 1000);
-      };
-
-      const triggerPrint = () => {
-        try {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-          toast.success("Print dialog opened. Choose 'Save as PDF' to export.");
-        } catch {
-          toast.error("Could not open print dialog. Please use your browser's Print (Ctrl/Cmd+P).");
-          try {
-            window.print();
-          } catch {}
-        } finally {
-          cleanup();
-        }
-      };
-
-      iframe.onload = triggerPrint;
-
-      try {
-        (iframe as any).srcdoc = fullHtml;
-        setTimeout(() => {
-          try {
-            if (iframe.contentDocument?.readyState === "complete") {
-              triggerPrint();
-            }
-          } catch {}
-        }, 600);
-      } catch {
-        const blob = new Blob([fullHtml], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        iframe.src = url;
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      }
+      window.print();
+      toast.success("Print dialog opened. Choose 'Save as PDF' to export.");
     } catch {
-      toast.error("Failed to prepare resume for printing. Please use your browser's Print (Ctrl/Cmd+P).");
-      try {
-        window.print();
-      } catch {}
+      toast.error("Failed to open print dialog.");
     }
   };
 
@@ -454,35 +256,16 @@ export function ResumeEditor({
             </Button>
           </div>
 
-          {(() => {
-            const size = PAPER_SIZES[paperSize];
-            const scaledWidth = size.width * zoom;
-            const scaledHeight = contentHeight * zoom;
-            return (
-              <div
-                className="mx-auto relative"
-                style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
-              >
-                <div
-                  className="bg-white shadow-sm rounded-xl border overflow-hidden"
-                  style={{
-                    width: `${size.width}px`,
-                    height: `${contentHeight}px`,
-                    transform: `scale(${zoom})`,
-                    transformOrigin: "top left",
-                  }}
-                >
-                  <iframe
-                    ref={previewRef}
-                    title="Resume Preview"
-                    className="w-full h-full border-0 rounded-xl"
-                    scrolling="no"
-                    style={{ overflow: "hidden" }}
-                  />
-                </div>
-              </div>
-            );
-          })()}
+          <div
+            className="mx-auto bg-white shadow-sm rounded-xl border overflow-auto"
+            style={{
+              maxWidth: paperSize === "A4" ? "794px" : "816px",
+              transform: `scale(${zoom})`,
+              transformOrigin: "top center",
+            }}
+          >
+            <PreviewPanel markdown={markdown} css={css} themeColor={themeColor} />
+          </div>
         </div>
 
         {/* Right Actions Sidebar */}
@@ -598,36 +381,17 @@ export function ResumeEditor({
             </Button>
           </div>
 
-          <div className="w-full h-full overflow-auto p-6">
-            {(() => {
-              const size = PAPER_SIZES[paperSize];
-              const scaledWidth = size.width * zoom;
-              const scaledHeight = contentHeight * zoom;
-              return (
-                <div
-                  className="mx-auto"
-                  style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
-                >
-                  <div
-                    className="bg-white shadow-sm rounded-xl border overflow-hidden"
-                    style={{
-                      width: `${size.width}px`,
-                      height: `${contentHeight}px`,
-                      transform: `scale(${zoom})`,
-                      transformOrigin: "top left",
-                    }}
-                  >
-                    <iframe
-                      ref={previewRef}
-                      title="Resume Preview Fullscreen"
-                      className="w-full h-full border-0 rounded-xl"
-                      scrolling="no"
-                      style={{ overflow: "hidden" }}
-                    />
-                  </div>
-                </div>
-              );
-            })()}
+          <div className="w-full h-full overflow-auto p-6 flex justify-center items-start">
+            <div
+              className="bg-white shadow-sm rounded-xl border overflow-auto"
+              style={{
+                maxWidth: paperSize === "A4" ? "794px" : "816px",
+                transform: `scale(${zoom})`,
+                transformOrigin: "top center",
+              }}
+            >
+              <PreviewPanel markdown={markdown} css={css} themeColor={themeColor} />
+            </div>
           </div>
         </div>
       )}
