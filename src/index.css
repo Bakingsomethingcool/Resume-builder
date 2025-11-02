@@ -127,66 +127,87 @@
 }
 
 @media print {
+  @page {
+    margin: 0;
+    size: A4;
+  }
+  
   body {
     margin: 0;
     padding: 0;
-    background: white;
+    background: white !important;
   }
   
-  /* Hide all UI elements - be very aggressive */
-  body > *:not(#root),
+  /* Hide all UI chrome */
+  body > *:not(#root) {
+    display: none !important;
+  }
+  
+  /* Hide everything in the app except the preview */
+  #root > div > div:first-child,
+  #root > div > div > div:first-child,
   header,
   nav,
   aside,
   footer,
   button,
-  .border-b,
-  [class*="border"],
-  [class*="toolbar"] {
+  [role="button"] {
     display: none !important;
   }
   
-  /* Hide everything in root except preview wrapper */
-  #root > * {
-    display: none !important;
-  }
-  
-  #root .preview-wrapper {
+  /* Ensure preview wrapper and pages are visible */
+  .preview-wrapper,
+  .preview-wrapper * {
     display: block !important;
+    visibility: visible !important;
   }
   
-  /* Show only the preview wrapper */
   .preview-wrapper {
-    display: block !important;
     position: static !important;
     transform: none !important;
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
+    width: 100% !important;
+    height: auto !important;
   }
   
-  /* Ensure pages print correctly */
+  /* Page styling for print */
   .page {
     page-break-after: always;
+    page-break-inside: avoid;
     margin: 0 !important;
     padding: 2.5rem !important;
     box-shadow: none !important;
     background: white !important;
     color: black !important;
+    width: 100% !important;
+    min-height: auto !important;
   }
   
   .page:last-child {
     page-break-after: auto;
   }
   
-  /* Force all text to be black for print */
+  /* Ensure content is visible */
   .page * {
     color: black !important;
+    visibility: visible !important;
   }
   
   /* Preserve theme color for headings */
   .page h2 {
     color: #377BB5 !important;
     border-bottom-color: #377BB5 !important;
+  }
+  
+  /* Ensure lists display correctly */
+  .page ul,
+  .page ol {
+    display: block !important;
+  }
+  
+  .page li {
+    display: list-item !important;
   }
 }
