@@ -115,8 +115,10 @@ const getPreviewHtml = () => {
           <!-- Hidden source content -->
           <div id="source" style="position:absolute; left:-99999px; top:-99999px;">${html}</div>
 
-          <!-- Paginated pages here -->
-          <div id="pages"></div>
+          <!-- Root wrapper ensures CSS selectors like '#resume-preview h1' work -->
+          <div id="resume-preview">
+            <div id="pages"></div>
+          </div>
 
           <script>
             (function paginate() {
