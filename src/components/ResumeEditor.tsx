@@ -185,29 +185,37 @@ const isDark =
               <TabsTrigger value="markdown">Markdown</TabsTrigger>
               <TabsTrigger value="css">CSS</TabsTrigger>
             </TabsList>
-            <TabsContent value="markdown" className="m-0 p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Edit your resume content
-              </Label>
-              <CodeMirror
-                value={markdown}
-                extensions={[markdownLang()]}
-                theme={isDark ? oneDark : undefined}
-                onChange={(value: string) => setMarkdown(value)}
-                height="100%"
-              />
+            <TabsContent value="markdown" className="m-0 p-0 flex-1 min-h-0">
+              <div className="flex flex-col h-full min-h-0">
+                <Label className="text-xs text-muted-foreground mb-2 block px-4 pt-4">
+                  Edit your resume content
+                </Label>
+                <div className="flex-1 min-h-0 overflow-auto px-4 pb-4">
+                  <CodeMirror
+                    value={markdown}
+                    extensions={[markdownLang()]}
+                    theme={isDark ? oneDark : undefined}
+                    onChange={(value: string) => setMarkdown(value)}
+                    height="100%"
+                  />
+                </div>
+              </div>
             </TabsContent>
-            <TabsContent value="css" className="m-0 p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Customize styling
-              </Label>
-              <CodeMirror
-                value={css}
-                extensions={[cssLang()]}
-                theme={isDark ? oneDark : undefined}
-                onChange={(value: string) => setCss(value)}
-                height="100%"
-              />
+            <TabsContent value="css" className="m-0 p-0 flex-1 min-h-0">
+              <div className="flex flex-col h-full min-h-0">
+                <Label className="text-xs text-muted-foreground mb-2 block px-4 pt-4">
+                  Customize styling
+                </Label>
+                <div className="flex-1 min-h-0 overflow-auto px-4 pb-4">
+                  <CodeMirror
+                    value={css}
+                    extensions={[cssLang()]}
+                    theme={isDark ? oneDark : undefined}
+                    onChange={(value: string) => setCss(value)}
+                    height="100%"
+                  />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
