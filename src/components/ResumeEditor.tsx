@@ -45,6 +45,8 @@ export function ResumeEditor({
   const [themeColor, setThemeColor] = useState("#377BB5");
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // Add: track total content height (sum of all pages)
+  const [contentHeight, setContentHeight] = useState<number>(paperSize === "A4" ? 1123 : 1056);
   const PAPER_SIZES = {
     A4: { width: 794, height: 1123 },
     Letter: { width: 816, height: 1056 },
@@ -58,6 +60,7 @@ const isDark =
 // Build the full HTML used in preview/printing
 const getPreviewHtml = () => {
   const html = markdownToHtml(markdown);
+  const size = PAPER_SIZES[paperSize];
   const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
   return `
       <!DOCTYPE html>
@@ -65,16 +68,103 @@ const getPreviewHtml = () => {
         <head>
           <meta charset="utf-8" />
           <style>
-            html,body{margin:0;padding:0;overflow:hidden;height:100%;}
+            /* Base and theme */
+            html, body { margin: 0; padding: 0; height: auto; overflow: visible; }
+            body { background: #f3f4f6; }
+            :root { --theme-color: ${themeColor}; --page-width: ${size.width}px; --page-height: ${size.height}px; --page-gap: 16px; --page-padding: 40px; }
+
+            /* Page box for on-screen preview */
+            .page {
+              width: var(--page-width);
+              height: var(--page-height);
+              margin: var(--page-gap) auto;
+              background: #fff;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+              border: 1px solid #e5e7eb;
+              overflow: hidden; /* keep each page scoped */
+            }
+            .page-content {
+              /* Provide reasonable defaults so most body-based templates still look good */
+              box-sizing: border-box;
+              width: 100%;
+              height: 100%;
+              padding: var(--page-padding);
+              color: #1a1a1a;
+              line-height: 1.6;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            }
+
+            /* Printing */
             @page { size: ${pageSizeCss}; margin: 0; }
-            @media print { 
-              html,body { margin:0; padding:0; }
+            @media print {
+              body { background: white; }
+              .page {
+                margin: 0 auto;
+                box-shadow: none;
+                border: none;
+                page-break-after: always;
+              }
             }
           </style>
-          <style>:root{--theme-color:${themeColor};}</style>
           <style>${css}</style>
         </head>
-        <body>${html}</body>
+        <body>
+          <!-- Hidden source content -->
+          <div id="source" style="position:absolute; left:-99999px; top:-99999px;">${html}</div>
+
+          <!-- Paginated pages here -->
+          <div id="pages"></div>
+
+          <script>
+            (function paginate() {
+              const source = document.getElementById('source');
+              const pagesRoot = document.getElementById('pages');
+              if (!source || !pagesRoot) return;
+
+              // Clear previous pages
+              pagesRoot.innerHTML = '';
+
+              const pageHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-height')) || 1123;
+              const pagePadding = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-padding')) || 40;
+              const usableHeight = pageHeight - (pagePadding * 2);
+
+              function createPage() {
+                const page = document.createElement('div');
+                page.className = 'page';
+                const content = document.createElement('div');
+                content.className = 'page-content';
+                page.appendChild(content);
+                pagesRoot.appendChild(page);
+                return content;
+              }
+
+              let currentPage = createPage();
+
+              // Move nodes one by one to pages
+              while (source.firstChild) {
+                const node = source.firstChild;
+                currentPage.appendChild(node);
+
+                // If overflows the usable area, move node to next page
+                if (currentPage.scrollHeight > usableHeight) {
+                  // If the node itself is too big for a single page, leave it overflowing on this page
+                  // Otherwise, move it to a new page
+                  if (node.nodeType === 1 && node.scrollHeight < currentPage.scrollHeight) {
+                    currentPage.removeChild(node);
+                    currentPage = createPage();
+                    currentPage.appendChild(node);
+                  }
+                }
+              }
+
+              // Report total content height to parent for sizing (same-origin)
+              const totalHeight = pagesRoot.scrollHeight;
+              try {
+                window.parent.postMessage({ type: 'resume-preview-height', height: totalHeight }, '*');
+              } catch (e) {}
+            })();
+          </script>
+        </body>
       </html>
     `;
 };
@@ -93,7 +183,32 @@ const getPreviewHtml = () => {
     if (!previewRef.current) return;
     const fullHtml = getPreviewHtml();
     const iframe = previewRef.current;
+
+    // Listen for height messages from the iframe to resize the preview to fit all pages
+    const onMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === "resume-preview-height") {
+        const height = typeof e.data.height === "number" ? e.data.height : undefined;
+        if (height && height > 0) {
+          setContentHeight(height);
+        }
+      }
+    };
+    window.addEventListener("message", onMessage, { once: true });
+
+    // Set document
     iframe.srcdoc = fullHtml;
+
+    // Fallback in case postMessage doesn't fire
+    iframe.onload = () => {
+      try {
+        const doc = iframe.contentDocument;
+        const body = doc?.body;
+        if (body) {
+          const h = body.querySelector("#pages")?.scrollHeight || body.scrollHeight;
+          if (h && h > 0) setContentHeight(h);
+        }
+      } catch {}
+    };
   };
 
   const handleSave = async () => {
@@ -359,19 +474,18 @@ const getPreviewHtml = () => {
           {(() => {
             const size = PAPER_SIZES[paperSize];
             const scaledWidth = size.width * zoom;
-            const scaledHeight = size.height * zoom;
+            // Use measured contentHeight to fit all pages
+            const scaledHeight = contentHeight * zoom;
             return (
               <div
                 className="mx-auto relative"
                 style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
               >
-                {/* Removed floating controls inside preview to keep toolbar outside */}
-
                 <div
                   className="bg-white shadow-sm rounded-xl border"
                   style={{
                     width: `${size.width}px`,
-                    height: `${size.height}px`,
+                    height: `${contentHeight}px`,
                     transform: `scale(${zoom})`,
                     transformOrigin: "top left",
                   }}
@@ -505,7 +619,7 @@ const getPreviewHtml = () => {
             {(() => {
               const size = PAPER_SIZES[paperSize];
               const scaledWidth = size.width * zoom;
-              const scaledHeight = size.height * zoom;
+              const scaledHeight = contentHeight * zoom;
               return (
                 <div
                   className="mx-auto"
@@ -515,7 +629,7 @@ const getPreviewHtml = () => {
                     className="bg-white shadow-sm rounded-xl border"
                     style={{
                       width: `${size.width}px`,
-                      height: `${size.height}px`,
+                      height: `${contentHeight}px`,
                       transform: `scale(${zoom})`,
                       transformOrigin: "top left",
                     }}
