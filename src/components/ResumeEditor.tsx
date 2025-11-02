@@ -87,7 +87,7 @@ const getPreviewHtml = () => {
               /* Provide reasonable defaults so most body-based templates still look good */
               box-sizing: border-box;
               width: 100%;
-              height: 100%;
+              /* Remove fixed height so natural content height can be measured correctly for pagination */
               padding: var(--page-padding);
               color: #1a1a1a;
               line-height: 1.6;
@@ -126,7 +126,6 @@ const getPreviewHtml = () => {
 
               const pageHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-height')) || 1123;
               const pagePadding = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-padding')) || 40;
-              const usableHeight = pageHeight - (pagePadding * 2);
 
               function createPage() {
                 const page = document.createElement('div');
@@ -145,15 +144,11 @@ const getPreviewHtml = () => {
                 const node = source.firstChild;
                 currentPage.appendChild(node);
 
-                // If overflows the usable area, move node to next page
-                if (currentPage.scrollHeight > usableHeight) {
-                  // If the node itself is too big for a single page, leave it overflowing on this page
-                  // Otherwise, move it to a new page
-                  if (node.nodeType === 1 && node.scrollHeight < currentPage.scrollHeight) {
-                    currentPage.removeChild(node);
-                    currentPage = createPage();
-                    currentPage.appendChild(node);
-                  }
+                // If the page content exceeds the page box height, move node to next page
+                if (currentPage.scrollHeight > pageHeight) {
+                  currentPage.removeChild(node);
+                  currentPage = createPage();
+                  currentPage.appendChild(node);
                 }
               }
 
