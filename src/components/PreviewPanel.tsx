@@ -47,8 +47,9 @@ export function PreviewPanel({
         margin-bottom: 1rem;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         width: ${paperSize === "A4" ? "210mm" : "8.5in"};
-        min-height: ${paperSize === "A4" ? "297mm" : "11in"};
+        height: ${paperSize === "A4" ? "297mm" : "11in"};
         box-sizing: border-box;
+        overflow: hidden; /* enforce fixed page height */
       }
       
       .dark .page {
@@ -134,15 +135,14 @@ export function PreviewPanel({
 
     const container = containerRef.current;
     const pageHeightPx = paperSize === "A4" ? 297 * 3.7795275591 : 11 * 96; // A4 mm->px or Letter in->px
-    const pagePaddingPx = 2.5 * 16 * 2; // 2.5rem top + bottom in px
-    const availableHeight = pageHeightPx - pagePaddingPx;
 
     // Clear existing pages
     container.innerHTML = "";
 
-    // Create a temporary container to measure content at the correct width
+    // Create a temporary container with content that has CSS applied (including #resume-preview rules)
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = parsedHtml;
+    tempDiv.id = "resume-preview";
     tempDiv.style.visibility = "hidden";
     tempDiv.style.position = "absolute";
     tempDiv.style.left = "-99999px";
@@ -150,65 +150,52 @@ export function PreviewPanel({
     tempDiv.style.width = paperSize === "A4" ? "210mm" : "8.5in";
     document.body.appendChild(tempDiv);
 
-    // Helper to measure node height inside tempDiv
-    const getNodeHeight = (node: Node): number => {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        return (node as HTMLElement).offsetHeight || 0;
-      }
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = (node.textContent || "").trim();
-        if (!text) return 0;
-        const p = document.createElement("p");
-        p.textContent = text;
-        // Insert right after the text node to maintain context styles as much as possible
-        const parent = node.parentNode ?? tempDiv;
-        parent.insertBefore(p, node.nextSibling);
-        const h = p.offsetHeight || 0;
-        parent.removeChild(p);
-        return h;
-      }
-      return 0;
-    };
+    // Create a measuring page to accumulate nodes and measure real layout height (including margins)
+    const measurePage = document.createElement("div");
+    measurePage.className = "page";
+    measurePage.style.visibility = "hidden";
+    measurePage.style.position = "absolute";
+    measurePage.style.left = "-99999px";
+    measurePage.style.top = "0";
+    measurePage.style.width = paperSize === "A4" ? "210mm" : "8.5in";
+    document.body.appendChild(measurePage);
 
-    // Create pages
     const pages: HTMLElement[] = [];
-    let currentPage = document.createElement("div");
-    currentPage.className = "page";
-    // First page should host the scoped id for CSS rules
-    currentPage.id = "resume-preview";
-    let currentHeight = 0;
+    let isFirstPage = true;
 
-    const nodes: Node[] = Array.from(tempDiv.childNodes);
-
-    for (const node of nodes) {
-      const nodeHeight = getNodeHeight(node);
-
-      // If this node would overflow the current page and we already have some content, start a new page
-      if (currentHeight + nodeHeight > availableHeight && currentPage.childNodes.length > 0) {
-        pages.push(currentPage);
-        currentPage = document.createElement("div");
-        currentPage.className = "page";
-        currentHeight = 0;
-      }
-
-      // Append a clone of the node to the current page
+    for (const node of Array.from(tempDiv.childNodes)) {
       const clone = node.cloneNode(true);
-      currentPage.appendChild(clone);
-      currentHeight += nodeHeight;
+      measurePage.appendChild(clone);
+
+      // If adding this node overflows the page height, roll back and start a new page
+      if (measurePage.scrollHeight > pageHeightPx) {
+        measurePage.removeChild(clone as Node);
+
+        const pageDiv = document.createElement("div");
+        pageDiv.className = "page";
+        if (isFirstPage) {
+          pageDiv.id = "resume-preview";
+          isFirstPage = false;
+        }
+        pageDiv.innerHTML = measurePage.innerHTML;
+        pages.push(pageDiv);
+
+        // Reset measuring page and append the node to the new measuring page
+        measurePage.innerHTML = "";
+        measurePage.appendChild(clone);
+      }
     }
 
-    // Add the last page if it has any content
-    if (currentPage.childNodes.length > 0) {
-      // Ensure only the very first page carries the #resume-preview id
-      if (pages.length > 0) {
-        // If we already pushed at least one page, make sure the first one has the id and others don't
-        if (!pages[0].id) pages[0].id = "resume-preview";
-        currentPage.id = "";
+    // Flush the last page
+    if (measurePage.childNodes.length > 0) {
+      const pageDiv = document.createElement("div");
+      pageDiv.className = "page";
+      if (isFirstPage) {
+        pageDiv.id = "resume-preview";
+        isFirstPage = false;
       }
-      pages.push(currentPage);
-    } else {
-      // If no content on currentPage but there are previous pages, ensure first has the id
-      if (pages.length > 0 && !pages[0].id) pages[0].id = "resume-preview";
+      pageDiv.innerHTML = measurePage.innerHTML;
+      pages.push(pageDiv);
     }
 
     // Append all pages to container
@@ -218,6 +205,7 @@ export function PreviewPanel({
 
     // Cleanup
     document.body.removeChild(tempDiv);
+    document.body.removeChild(measurePage);
   }, [parsedHtml, paperSize]);
 
   return (
