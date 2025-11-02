@@ -257,14 +257,18 @@ export function ResumeEditor({
           </div>
 
           <div
-            className="mx-auto bg-white shadow-sm rounded-xl border overflow-auto"
+            className="mx-auto"
             style={{
-              maxWidth: paperSize === "A4" ? "794px" : "816px",
               transform: `scale(${zoom})`,
               transformOrigin: "top center",
             }}
           >
-            <PreviewPanel markdown={markdown} css={css} themeColor={themeColor} />
+            <PreviewPanel 
+              markdown={markdown} 
+              css={css} 
+              themeColor={themeColor}
+              paperSize={paperSize}
+            />
           </div>
         </div>
 
@@ -383,14 +387,17 @@ export function ResumeEditor({
 
           <div className="w-full h-full overflow-auto p-6 flex justify-center items-start">
             <div
-              className="bg-white shadow-sm rounded-xl border overflow-auto"
               style={{
-                maxWidth: paperSize === "A4" ? "794px" : "816px",
                 transform: `scale(${zoom})`,
                 transformOrigin: "top center",
               }}
             >
-              <PreviewPanel markdown={markdown} css={css} themeColor={themeColor} />
+              <PreviewPanel 
+                markdown={markdown} 
+                css={css} 
+                themeColor={themeColor}
+                paperSize={paperSize}
+              />
             </div>
           </div>
         </div>
