@@ -133,63 +133,88 @@ export function PreviewPanel({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const pageHeight = paperSize === "A4" ? 297 * 3.7795275591 : 11 * 96; // Convert mm/in to px
-    const pagePadding = 2.5 * 16 * 2; // 2.5rem top + bottom in px
-    const availableHeight = pageHeight - pagePadding;
+    const pageHeightPx = paperSize === "A4" ? 297 * 3.7795275591 : 11 * 96; // A4 mm->px or Letter in->px
+    const pagePaddingPx = 2.5 * 16 * 2; // 2.5rem top + bottom in px
+    const availableHeight = pageHeightPx - pagePaddingPx;
 
     // Clear existing pages
     container.innerHTML = "";
 
-    // Create a temporary container to measure content
+    // Create a temporary container to measure content at the correct width
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = parsedHtml;
     tempDiv.style.visibility = "hidden";
     tempDiv.style.position = "absolute";
+    tempDiv.style.left = "-99999px";
+    tempDiv.style.top = "0";
     tempDiv.style.width = paperSize === "A4" ? "210mm" : "8.5in";
     document.body.appendChild(tempDiv);
+
+    // Helper to measure node height inside tempDiv
+    const getNodeHeight = (node: Node): number => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        return (node as HTMLElement).offsetHeight || 0;
+      }
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = (node.textContent || "").trim();
+        if (!text) return 0;
+        const p = document.createElement("p");
+        p.textContent = text;
+        // Insert right after the text node to maintain context styles as much as possible
+        const parent = node.parentNode ?? tempDiv;
+        parent.insertBefore(p, node.nextSibling);
+        const h = p.offsetHeight || 0;
+        parent.removeChild(p);
+        return h;
+      }
+      return 0;
+    };
 
     // Create pages
     const pages: HTMLElement[] = [];
     let currentPage = document.createElement("div");
     currentPage.className = "page";
-    currentPage.id = pages.length === 0 ? "resume-preview" : "";
-
-    const children = Array.from(tempDiv.childNodes);
+    // First page should host the scoped id for CSS rules
+    currentPage.id = "resume-preview";
     let currentHeight = 0;
 
-    children.forEach((node) => {
-      const clone = node.cloneNode(true) as HTMLElement;
-      currentPage.appendChild(clone);
+    const nodes: Node[] = Array.from(tempDiv.childNodes);
 
-      // Measure height
-      const cloneHeight = clone instanceof HTMLElement ? clone.offsetHeight : 0;
+    for (const node of nodes) {
+      const nodeHeight = getNodeHeight(node);
 
-      if (currentHeight + cloneHeight > availableHeight && currentPage.childNodes.length > 1) {
-        // Remove the last node and start a new page
-        currentPage.removeChild(clone);
+      // If this node would overflow the current page and we already have some content, start a new page
+      if (currentHeight + nodeHeight > availableHeight && currentPage.childNodes.length > 0) {
         pages.push(currentPage);
-
         currentPage = document.createElement("div");
         currentPage.className = "page";
-        currentPage.appendChild(clone);
-        currentHeight = cloneHeight;
-      } else {
-        currentHeight += cloneHeight;
+        currentHeight = 0;
       }
-    });
 
-    // Add the last page
-    if (currentPage.childNodes.length > 0) {
-      pages.push(currentPage);
+      // Append a clone of the node to the current page
+      const clone = node.cloneNode(true);
+      currentPage.appendChild(clone);
+      currentHeight += nodeHeight;
     }
 
-    // Ensure first page has the ID
-    if (pages.length > 0 && !pages[0].id) {
-      pages[0].id = "resume-preview";
+    // Add the last page if it has any content
+    if (currentPage.childNodes.length > 0) {
+      // Ensure only the very first page carries the #resume-preview id
+      if (pages.length > 0) {
+        // If we already pushed at least one page, make sure the first one has the id and others don't
+        if (!pages[0].id) pages[0].id = "resume-preview";
+        currentPage.id = "";
+      }
+      pages.push(currentPage);
+    } else {
+      // If no content on currentPage but there are previous pages, ensure first has the id
+      if (pages.length > 0 && !pages[0].id) pages[0].id = "resume-preview";
     }
 
     // Append all pages to container
-    pages.forEach((page) => container.appendChild(page));
+    for (const page of pages) {
+      container.appendChild(page);
+    }
 
     // Cleanup
     document.body.removeChild(tempDiv);
