@@ -138,24 +138,37 @@
     background: white !important;
   }
   
-  /* Hide everything except the preview wrapper */
-  body > *:not(#root) {
+  /* Hide the top header bar */
+  .h-full > .border-b {
     display: none !important;
   }
   
-  /* Hide UI elements */
-  header,
-  nav,
-  aside,
-  footer,
-  button,
-  [role="button"],
-  .border-b,
-  [aria-label="Zoom out"],
-  [aria-label="Zoom in"],
-  [aria-label="Enter fullscreen"],
-  [aria-label="Export PDF"] {
+  /* Hide the editor panel (left side with tabs) */
+  .h-full > .flex-1 > .flex-\[1\.15\] {
     display: none !important;
+  }
+  
+  /* Hide the right sidebar */
+  .h-full > .flex-1 > aside {
+    display: none !important;
+  }
+  
+  /* Hide all buttons and controls */
+  button,
+  [role="button"] {
+    display: none !important;
+  }
+  
+  /* Make the preview panel take full width */
+  .h-full > .flex-1 {
+    display: block !important;
+  }
+  
+  .h-full > .flex-1 > .flex-\[1\] {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
   }
   
   /* Show only preview wrapper */
