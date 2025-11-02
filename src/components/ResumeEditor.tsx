@@ -63,17 +63,21 @@ const isDark =
 
   useEffect(() => {
     updatePreview();
-  }, [markdown, css, themeColor, paperSize]);
+  }, [markdown, css, themeColor, paperSize, isFullscreen]);
 
   const updatePreview = () => {
     if (!previewRef.current) return;
     const html = markdownToHtml(markdown);
+    const pageSizeCss = paperSize === "A4" ? "A4" : "letter";
     const fullHtml = `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8" />
-          <style>html,body{margin:0;padding:0;overflow:hidden;height:100%;}</style>
+          <style>
+            html,body{margin:0;padding:0;overflow:hidden;height:100%;}
+            @page { size: ${pageSizeCss}; margin: 0; }
+          </style>
           <style>:root{--theme-color:${themeColor};}</style>
           <style>${css}</style>
         </head>
@@ -113,7 +117,13 @@ const isDark =
   const exportToPDF = () => {
     if (!previewRef.current) return;
     const iframe = previewRef.current;
-    iframe.contentWindow?.print();
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    } catch {
+      // Fallback to window print if iframe print fails
+      window.print();
+    }
   };
 
   const exportMarkdown = () => {
@@ -264,6 +274,27 @@ const isDark =
 
         {/* Preview */}
         <div className="flex-[1] min-w-0 bg-muted overflow-auto p-6">
+          {/* Toolbar above preview */}
+          <div className="mb-3 flex items-center justify-end gap-2">
+            <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleZoomIn} aria-label="Zoom in">
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsFullscreen(true)}
+              aria-label="Enter fullscreen"
+            >
+              <Maximize className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={exportToPDF} aria-label="Export PDF">
+              <Download className="h-4 w-4" />
+            </Button>
+          </div>
+
           {(() => {
             const size = PAPER_SIZES[paperSize];
             const scaledWidth = size.width * zoom;
@@ -273,26 +304,7 @@ const isDark =
                 className="mx-auto relative"
                 style={{ width: `${scaledWidth}px`, height: `${scaledHeight}px` }}
               >
-                {/* Floating preview controls: zoom out, zoom in, fullscreen, download */}
-                <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
-                  <Button variant="outline" size="icon" onClick={handleZoomOut} aria-label="Zoom out">
-                    <ZoomOut className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={handleZoomIn} aria-label="Zoom in">
-                    <ZoomIn className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setIsFullscreen(true)}
-                    aria-label="Enter fullscreen"
-                  >
-                    <Maximize className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={exportToPDF} aria-label="Export PDF">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
+                {/* Removed floating controls inside preview to keep toolbar outside */}
 
                 <div
                   className="bg-white shadow-sm rounded-xl border"
