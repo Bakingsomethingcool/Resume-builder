@@ -2,7 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import CodeMirror from "@uiw/react-codemirror";
+import { markdown as markdownLang } from "@codemirror/lang-markdown";
+import { css as cssLang } from "@codemirror/lang-css";
+import { oneDark } from "@codemirror/theme-one-dark";
 import { markdownToHtml } from "@/lib/markdown-to-html";
 import { Download, FileDown, FileUp, Save } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -30,6 +33,10 @@ export function ResumeEditor({
   const [isRenaming, setIsRenaming] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const previewRef = useRef<HTMLIFrameElement>(null);
+// Detect theme for CodeMirror
+const isDark =
+  typeof document !== "undefined" &&
+  document.documentElement.classList.contains("dark");
 
   useEffect(() => {
     updatePreview();
@@ -174,32 +181,32 @@ export function ResumeEditor({
       {/* Editor and Preview */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
         {/* Editor */}
-        <div className="border-r overflow-hidden flex flex-col">
-          <Tabs defaultValue="markdown" className="flex-1 flex flex-col">
-            <TabsList className="w-full justify-start rounded-none border-b">
+        <div className="border-r flex flex-col min-h-0 overflow-auto">
+          <Tabs defaultValue="markdown" className="flex-1 flex flex-col min-h-0">
+            <TabsList className="sticky top-0 z-10 bg-background w-full justify-start rounded-none border-b">
               <TabsTrigger value="markdown">Markdown</TabsTrigger>
               <TabsTrigger value="css">CSS</TabsTrigger>
             </TabsList>
-            <TabsContent value="markdown" className="flex-1 m-0 p-4 overflow-auto">
+            <TabsContent value="markdown" className="m-0 p-4">
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Edit your resume content
               </Label>
-              <Textarea
+              <CodeMirror
                 value={markdown}
-                onChange={(e) => setMarkdown(e.target.value)}
-                className="font-mono text-sm min-h-[calc(100vh-250px)] resize-none"
-                placeholder="# Your Name&#10;**Title**&#10;&#10;## Experience&#10;..."
+                extensions={[markdownLang()]}
+                theme={isDark ? oneDark : undefined}
+                onChange={(value: string) => setMarkdown(value)}
               />
             </TabsContent>
-            <TabsContent value="css" className="flex-1 m-0 p-4 overflow-auto">
+            <TabsContent value="css" className="m-0 p-4">
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Customize styling
               </Label>
-              <Textarea
+              <CodeMirror
                 value={css}
-                onChange={(e) => setCss(e.target.value)}
-                className="font-mono text-sm min-h-[calc(100vh-250px)] resize-none"
-                placeholder="body { font-family: sans-serif; }"
+                extensions={[cssLang()]}
+                theme={isDark ? oneDark : undefined}
+                onChange={(value: string) => setCss(value)}
               />
             </TabsContent>
           </Tabs>
