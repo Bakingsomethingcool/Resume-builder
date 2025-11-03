@@ -140,6 +140,21 @@ export function PreviewPanel({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+
+    // Preserve scroll position of the nearest scrollable ancestor
+    const findScrollParent = (el: HTMLElement | null): HTMLElement | null => {
+      let p = el?.parentElement;
+      while (p) {
+        const style = getComputedStyle(p);
+        if (style.overflowY === "auto" || style.overflowY === "scroll") return p;
+        p = p.parentElement;
+      }
+      return null;
+    };
+    const scrollEl = findScrollParent(container);
+    const prevScrollTop = scrollEl ? scrollEl.scrollTop : 0;
+    const prevScrollHeight = scrollEl ? scrollEl.scrollHeight : 0;
+
     const pageHeightPx = paperSize === "A4" ? 297 * 3.7795275591 : 11 * 96; // A4 mm->px or Letter in->px
 
     // Clear existing pages
@@ -206,6 +221,14 @@ export function PreviewPanel({
     // Append all pages to container
     for (const page of pages) {
       container.appendChild(page);
+    }
+
+    // Restore scroll position after DOM updates
+    if (scrollEl) {
+      requestAnimationFrame(() => {
+        const nearBottom = prevScrollTop > prevScrollHeight - 50;
+        scrollEl.scrollTop = nearBottom ? scrollEl.scrollHeight : prevScrollTop;
+      });
     }
 
     // Cleanup
