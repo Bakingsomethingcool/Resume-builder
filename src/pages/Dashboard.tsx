@@ -22,8 +22,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // No auth page; send users back to Landing
-      navigate("/");
+      navigate("/auth");
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -69,7 +68,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.svg" alt="Logo" className="h-8 w-8 cursor-pointer" onClick={() => navigate("/")} />
-            <h1 className="text-xl font-semibold">ResumeCraft</h1>
+            <h1 className="text-xl font-semibold">Resume Builder</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>

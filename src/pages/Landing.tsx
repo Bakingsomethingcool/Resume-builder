@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Sun, Moon } from "lucide-react";
+import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Rocket, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 
@@ -32,8 +32,11 @@ export default function Landing() {
   };
 
   const handleGetStarted = () => {
-    // Always take users to the dashboard; no separate auth page
-    navigate("/dashboard");
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
   };
 
   return (
@@ -59,7 +62,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
-            <span className="text-xl font-semibold">ResumeCraft</span>
+            <span className="text-xl font-semibold">Resume Builder</span>
             <span className="ml-2 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
               <Sparkles className="h-3 w-3" /> New
             </span>
@@ -85,7 +88,7 @@ export default function Landing() {
               ) : isAuthenticated ? (
                 "Dashboard"
               ) : (
-                "Get Started"
+                "Sign In"
               )}
             </Button>
           </div>
@@ -135,11 +138,7 @@ export default function Landing() {
               className="group"
               disabled={isLoading}
             >
-              <img
-                src="/logo.svg"
-                alt="ResumeCraft Rocket"
-                className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-0.5"
-              />
+              <Rocket className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
               Explore Templates
             </Button>
           </div>
@@ -255,7 +254,15 @@ Product Strategy, Roadmaps, UX`}
       {/* Footer */}
       <footer className="border-t mt-8">
         <div className="max-w-7xl mx-auto px-8 py-8 text-center text-sm text-muted-foreground">
-          © 2025 ResumeCraft
+          Built with{" "}
+          <a
+            href="https://vly.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-primary transition-colors"
+          >
+            vly.ai
+          </a>
         </div>
       </footer>
     </div>

@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
+import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { InstrumentationProvider } from "@/instrumentation.tsx";
-/* removed AuthPage route */
+import AuthPage from "@/pages/Auth.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { StrictMode, useEffect } from "react";
@@ -40,13 +41,14 @@ function RouteSyncer() {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <VlyToolbar />
     <InstrumentationProvider>
       <ConvexAuthProvider client={convex}>
         <BrowserRouter>
           <RouteSyncer />
           <Routes>
             <Route path="/" element={<Landing />} />
-            {/* auth page removed */}
+            <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/editor/:id" element={<Editor />} />
             <Route path="*" element={<NotFound />} />

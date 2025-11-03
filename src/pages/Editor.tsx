@@ -18,8 +18,7 @@ export default function Editor() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // No auth page; send users back to Landing
-      navigate("/");
+      navigate("/auth");
     }
   }, [isLoading, isAuthenticated, navigate]);
 
