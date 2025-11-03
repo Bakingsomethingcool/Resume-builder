@@ -32,11 +32,8 @@ export default function Landing() {
   };
 
   const handleGetStarted = () => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    } else {
-      navigate("/auth");
-    }
+    // Always take users to the dashboard; no separate auth page
+    navigate("/dashboard");
   };
 
   return (
@@ -88,7 +85,7 @@ export default function Landing() {
               ) : isAuthenticated ? (
                 "Dashboard"
               ) : (
-                "Sign In"
+                "Get Started"
               )}
             </Button>
           </div>

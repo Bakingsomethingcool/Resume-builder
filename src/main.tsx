@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { InstrumentationProvider } from "@/instrumentation.tsx";
-import AuthPage from "@/pages/Auth.tsx";
+/* removed AuthPage route */
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { StrictMode, useEffect } from "react";
@@ -46,7 +46,7 @@ createRoot(document.getElementById("root")!).render(
           <RouteSyncer />
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
+            {/* auth page removed */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/editor/:id" element={<Editor />} />
             <Route path="*" element={<NotFound />} />
