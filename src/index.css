@@ -376,3 +376,17 @@
     color: #000000 !important;
   }
 }
+
+/* Fix top gap in print: remove any residual top padding/margin/line on the first page and its first element */
+@media print {
+  .preview-wrapper #resume-preview > .page:first-child {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    border-top: 0 !important;
+  }
+  .preview-wrapper #resume-preview > .page:first-child > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+  }
+}
