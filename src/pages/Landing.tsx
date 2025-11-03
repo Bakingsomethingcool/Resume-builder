@@ -62,7 +62,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
-            <span className="text-xl font-semibold">Resume Builder</span>
+            <span className="text-xl font-semibold">ResumeCraft</span>
             <span className="ml-2 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
               <Sparkles className="h-3 w-3" /> New
             </span>
@@ -254,15 +254,7 @@ Product Strategy, Roadmaps, UX`}
       {/* Footer */}
       <footer className="border-t mt-8">
         <div className="max-w-7xl mx-auto px-8 py-8 text-center text-sm text-muted-foreground">
-          Built with{" "}
-          <a
-            href="https://vly.ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-primary transition-colors"
-          >
-            vly.ai
-          </a>
+          © 2025 ResumeCraft
         </div>
       </footer>
     </div>
