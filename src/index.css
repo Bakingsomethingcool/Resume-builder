@@ -390,3 +390,27 @@
     border-top: 0 !important;
   }
 }
+
+/* Remove any faint hairline at the very top in print (borders/outlines/shadows) */
+@media print {
+  .preview-wrapper,
+  .preview-wrapper * {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .preview-wrapper #resume-preview,
+  .preview-wrapper .page,
+  .preview-wrapper #resume-preview > .page:first-child,
+  .preview-wrapper #resume-preview > .page:first-child::before,
+  .preview-wrapper #resume-preview > .page:first-child::after {
+    border: 0 !important;
+  }
+
+  /* Ensure absolutely no top offset remains */
+  .preview-wrapper #resume-preview,
+  .preview-wrapper #resume-preview > .page:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
