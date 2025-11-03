@@ -414,3 +414,10 @@
     padding-top: 0 !important;
   }
 }
+
+/* Remove any remaining app chrome hairline at the very top in print (e.g., editor header bottom border) */
+@media print {
+  .border-b {
+    border-bottom: 0 !important;
+  }
+}
