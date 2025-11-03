@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Rocket, Sun, Moon } from "lucide-react";
+import { ArrowRight, FileText, Loader2, Palette, Zap, Sparkles, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 
@@ -135,7 +135,11 @@ export default function Landing() {
               className="group"
               disabled={isLoading}
             >
-              <Rocket className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
+              <img
+                src="/logo.svg"
+                alt="ResumeCraft Rocket"
+                className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-0.5"
+              />
               Explore Templates
             </Button>
           </div>
