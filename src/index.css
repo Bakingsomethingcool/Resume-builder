@@ -323,17 +323,8 @@
   }
 }
 
-/* Final print-enforcement pass to ensure only the preview prints with zero padding and no scaling */
+/* Final print pass: keep preview visible without hiding ancestors */
 @media print {
-  /* Print only the resume preview content */
-  body * {
-    visibility: hidden !important;
-  }
-  .preview-wrapper,
-  .preview-wrapper * {
-    visibility: visible !important;
-  }
-
   /* Ensure the preview container itself contributes no margins/padding/transform */
   .preview-wrapper {
     position: static !important;
@@ -354,17 +345,9 @@
   }
 }
 
-/* Final print isolation & sizing fix: ensure only the preview prints and prevent layout from other elements causing cropping */
+/* Final print sizing: avoid hiding ancestors; ensure exact A4 sizing */
 @media print {
-  /* Remove any layout influence from the rest of the app */
-  body > *:not(.preview-wrapper) {
-    display: none !important;
-  }
-  #root > *:not(.preview-wrapper) {
-    display: none !important;
-  }
-
-  /* Make the preview the sole printable area with no transforms/margins */
+  /* Make the preview print without transforms/margins */
   .preview-wrapper {
     position: static !important;
     inset: auto !important;
