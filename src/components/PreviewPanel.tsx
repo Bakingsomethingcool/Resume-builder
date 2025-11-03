@@ -117,6 +117,12 @@ export function PreviewPanel({
           box-shadow: none !important;
           margin: 0 !important;
           page-break-after: always;
+          /* Remove only the top padding to eliminate big top margin in print */
+          padding-top: 0 !important;
+        }
+        /* Also remove any default top margin from the first element (e.g., H1) */
+        .page > *:first-child {
+          margin-top: 0 !important;
         }
         
         #resume-preview h2 {
